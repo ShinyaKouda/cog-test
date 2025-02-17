@@ -14,16 +14,3 @@ function initMyWebchat(url){
         // webchat.open();
     });
 };
-
-function updateChatHeight() {
-    const chatContainer = document.querySelector('.data-cognigy-webchat');
-    if (chatContainer) {
-        chatContainer.style.height = `100dvh`;
-    }
-}
-
-// 初期化時に実行
-updateChatHeight();
-
-// 画面サイズ変更時（アドレスバー縮小・キーボード表示時など）に高さを再計算
-window.addEventListener("resize", updateChatHeight);
