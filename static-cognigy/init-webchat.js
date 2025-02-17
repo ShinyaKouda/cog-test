@@ -18,7 +18,7 @@ function initMyWebchat(url){
 function updateChatHeight() {
     const chatContainer = document.querySelector('.data-cognigy-webchat');
     if (chatContainer) {
-        chatContainer.style.height = `${window.innerHeight}px`;
+        chatContainer.style.height = `100dvh`;
     }
 }
 
