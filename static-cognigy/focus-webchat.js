@@ -11,7 +11,7 @@ webchat.registerAnalyticsService(event => {
                 var topPosition = lastElement.offsetTop - lastElement.offsetHeight; // 最後のメッセージの上端の位置を取得
                 chatContainer.scrollTop = topPosition;
             }
-        }, 5);
+        }, 100);
     }
 
     // メッセージを送信したときは、最後のユーザーのメッセージが一番下に来るようにする
@@ -26,7 +26,7 @@ webchat.registerAnalyticsService(event => {
                 var offset = chatContainer.offsetHeight;
                 chatContainer.scrollTop = bottomPosition - offset;
             }
-        }, 5);
+        }, 100);
     }
 
 });
