@@ -27,10 +27,6 @@
         width: 100%; /* 幅を100%にする */
         z-index: 1000; /* 常に最前面に表示されるように設定 */
     }
-
-    [data-cognigy-webchat-root] .webchat-chat-history {
-        bottom: 300px;
-    }
     
 }
 
