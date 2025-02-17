@@ -40,7 +40,7 @@ webchat.registerAnalyticsService(event => {
                  * ここで clientHeight は「スクロールバー除く、コンテナの可視領域の高さ」。
                  */
                 chatContainer.scrollTop =
-                    lastUserMessage.offsetTop + lastUserMessage.offsetHeight - chatContainer.clientHeight - 50;
+                    lastUserMessage.offsetTop + lastUserMessage.offsetHeight - chatContainer.clientHeight - 300;
             }
         }, 50);
     }
