@@ -1,32 +1,40 @@
 webchat.registerAnalyticsService(event => {
 
-    // メッセージを受信したときは、最後のユーザーのメッセージが一番上に来るようにする
+    // チャット履歴のコンテナを取得
+    var chatContainer = document.querySelector('.webchat-chat-history');
+
+    // メッセージを受信したとき
     if (event.type === "webchat/incoming-message") {
         setTimeout(() => {
-            var chatContainer = document.querySelector('.webchat-chat-history');
             var elements = document.querySelectorAll('.regular-message.user');
-            var lastElement = elements[elements.length-1];
-            
+            var lastElement = elements[elements.length - 1];
+
             if (lastElement) {
-                var topPosition = lastElement.offsetTop - lastElement.offsetHeight; // 最後のメッセージの上端の位置を取得
-                chatContainer.scrollTop = topPosition;
+                lastElement.scrollIntoView({ behavior: "smooth", block: "end" });
             }
-        }, 5);
+        }, 50); // 遅延を50msに増加
     }
 
-    // メッセージを送信したときは、最後のユーザーのメッセージが一番下に来るようにする
+    // メッセージを送信したとき
     if (event.type === "webchat/outgoing-message") {
         setTimeout(() => {
-            var chatContainer = document.querySelector('.webchat-chat-history');
-            var elements = document.querySelectorAll('.regular-message.user');
-            var lastElement = elements[elements.length-1];
-            
-            if (lastElement) {
-                var bottomPosition = lastElement.offsetTop + lastElement.offsetHeight - lastElement.offsetHeight; // 最後のメッセージの下端の位置を取得
-                var offset = chatContainer.offsetHeight;
-                chatContainer.scrollTop = bottomPosition - offset;
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             }
-        }, 5);
+        }, 50); // 遅延を50msに増加
     }
 
+});
+
+// メッセージの追加を監視するための MutationObserver
+document.addEventListener("DOMContentLoaded", () => {
+    var chatContainer = document.querySelector('.webchat-chat-history');
+    
+    if (chatContainer) {
+        const observer = new MutationObserver(() => {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        });
+
+        observer.observe(chatContainer, { childList: true, subtree: true });
+    }
 });
