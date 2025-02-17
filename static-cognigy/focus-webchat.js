@@ -1,40 +1,47 @@
 webchat.registerAnalyticsService(event => {
+    // チャット履歴のスクロール可能なコンテナ
+    const chatContainer = document.querySelector('.webchat-chat-history');
 
-    // チャット履歴のコンテナを取得
-    var chatContainer = document.querySelector('.webchat-chat-history');
-
-    // メッセージを受信したとき
+    // 受信メッセージ時の処理
     if (event.type === "webchat/incoming-message") {
         setTimeout(() => {
-            var elements = document.querySelectorAll('.regular-message.user');
-            var lastElement = elements[elements.length - 1];
-
-            if (lastElement) {
-                lastElement.scrollIntoView({ behavior: "smooth", block: "end" });
+            // 最後に投稿されたユーザーのメッセージ要素を取得
+            const userMessages = document.querySelectorAll('.regular-message.user');
+            const lastUserMessage = userMessages[userMessages.length - 1];
+            
+            if (lastUserMessage && chatContainer) {
+                /**
+                 * 「一番上」は可視領域の最上部なので、
+                 * chatContainer.scrollTop に "lastUserMessage の先頭部分" が来るように設定。
+                 * 
+                 * offsetTop は「(親要素から)ユーザー要素の先頭までの距離」。
+                 * chatContainer.scrollTop を lastUserMessage.offsetTop にすることで、
+                 * ユーザー要素の先頭がコンテナの可視領域の上端に来る。
+                 */
+                chatContainer.scrollTop = lastUserMessage.offsetTop;
             }
-        }, 50); // 遅延を50msに増加
+        }, 50); // 遅延を入れて描画完了を待つ
     }
 
-    // メッセージを送信したとき
+    // 送信メッセージ時の処理
     if (event.type === "webchat/outgoing-message") {
         setTimeout(() => {
-            if (chatContainer) {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+            // 最後に投稿されたユーザーのメッセージ要素を取得
+            const userMessages = document.querySelectorAll('.regular-message.user');
+            const lastUserMessage = userMessages[userMessages.length - 1];
+            
+            if (lastUserMessage && chatContainer) {
+                /**
+                 * 「一番下」は可視領域の最下部なので、
+                 * （lastUserMessage の末端）が (chatContainer.scrollTop + 可視領域の高さ) に来るように。
+                 * 
+                 * → chatContainer.scrollTop = lastUserMessage.offsetTop + lastUserMessage.offsetHeight - chatContainer.clientHeight
+                 * 
+                 * ここで clientHeight は「スクロールバー除く、コンテナの可視領域の高さ」。
+                 */
+                chatContainer.scrollTop =
+                    lastUserMessage.offsetTop + lastUserMessage.offsetHeight - chatContainer.clientHeight;
             }
-        }, 50); // 遅延を50msに増加
-    }
-
-});
-
-// メッセージの追加を監視するための MutationObserver
-document.addEventListener("DOMContentLoaded", () => {
-    var chatContainer = document.querySelector('.webchat-chat-history');
-    
-    if (chatContainer) {
-        const observer = new MutationObserver(() => {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        });
-
-        observer.observe(chatContainer, { childList: true, subtree: true });
+        }, 50);
     }
 });
