@@ -39,7 +39,7 @@ function adjustChatInput() {
   if (!chatInput) return;
   
   // visualViewport が対応している場合、オフセットを取得
-  const offsetTop = window.visualViewport ? window.visualViewport.offsetTop : 0;
+  const offsetTop = 0;//window.visualViewport ? window.visualViewport.offsetTop : 0;
   // 例: キーボードが表示されると、offsetTop にキーボードの高さ分の値が入る場合があるため、それを bottom に反映
   chatInput.style.bottom = offsetTop + 'px';
 }
