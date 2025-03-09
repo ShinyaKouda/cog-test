@@ -24,29 +24,3 @@ webchat.registerAnalyticsService(event => {
         }, 100);
     }
 });
-
-function setVh() {
-    let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-}
-
-// 以下のイベントリスナーを追加
-window.addEventListener('resize', setVh);
-window.addEventListener('orientationchange', setVh);
-window.addEventListener('scroll', setVh);
-
-// キーボード表示時のイベントを検知（iOS向け）
-document.addEventListener('focusin', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        setTimeout(setVh, 100); // 少し遅延させて高さを再計算
-    }
-});
-
-document.addEventListener('focusout', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        setTimeout(setVh, 100); // 少し遅延させて高さを再計算
-    }
-});
-
-// 初期化
-setVh();
