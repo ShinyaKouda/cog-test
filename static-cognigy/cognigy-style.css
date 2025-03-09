@@ -20,6 +20,11 @@
         height: calc(var(--vh) * 100);
         right: 0;
         font-size: 16px;
+    };
+
+    /* チャット入力欄は常に最下部に表示 */
+    [data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input {
+        bottom: 0;
     }
 }
 
