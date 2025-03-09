@@ -14,6 +14,14 @@ webchat.registerAnalyticsService(event => {
                 // ユーザーメッセージがない場合は最初のボットのメッセージを取得
                 var botMessages = document.querySelectorAll('.regular-message.bot');
                 targetElement = botMessages[0];
+                // CSS セレクタを使って入力欄の要素を取得
+                const inputElement = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+                  
+                // 要素が存在する場合のみ実行
+                if (inputElement) {
+                    // 初期フォーカスを防ぐ
+                    inputElement.blur();
+                }
             }
             
             if (targetElement) {
