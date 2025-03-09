@@ -32,3 +32,17 @@ function setVh() {
 window.addEventListener('resize', setVh);
 setVh();
 
+function adjustChatInput() {
+  const chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+  if (!chatInput) return;
+  
+  // visualViewport が対応している場合、オフセットを取得
+  const offsetTop = window.visualViewport ? window.visualViewport.offsetTop : 0;
+  // 例: キーボードが表示されると、offsetTop にキーボードの高さ分の値が入る場合があるため、それを bottom に反映
+  chatInput.style.bottom = offsetTop + 'px';
+}
+
+window.visualViewport && window.visualViewport.addEventListener('resize', adjustChatInput);
+window.addEventListener('resize', adjustChatInput); // 万が一 visualViewport が使えない場合にも対応
+adjustChatInput();
+
