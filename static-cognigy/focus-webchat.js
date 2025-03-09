@@ -11,7 +11,7 @@ webchat.registerAnalyticsService(event => {
                 // ユーザーメッセージがある場合は最後のユーザーメッセージを取得
                 targetElement = userMessages[userMessages.length - 1];
             } else {
-                // ユーザーメッセージがない場合は最初のボットのメッセージを取得（.botクラスを仮定）
+                // ユーザーメッセージがない場合は最初のボットのメッセージを取得
                 var botMessages = document.querySelectorAll('.regular-message.bot');
                 targetElement = botMessages[0];
             }
