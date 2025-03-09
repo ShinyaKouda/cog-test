@@ -25,12 +25,14 @@ webchat.registerAnalyticsService(event => {
     }
 });
 
+/*
 function setVh() {
   let vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 window.addEventListener('resize', setVh);
 setVh();
+*/
 
 function adjustChatInput() {
   const chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
