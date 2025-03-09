@@ -20,6 +20,7 @@ webchat.registerAnalyticsService(event => {
                 // 要素が存在する場合のみ実行
                 if (inputElement) {
                     // 初期フォーカスを防ぐ
+                    inputElement.removeAttribute('autofocus');
                     inputElement.blur();
                 }
             }
