@@ -15,18 +15,19 @@
 
 /* レスポンシブ対応：Webchatの表示サイズ */
 @media only screen and (max-width: 768px) {
-    [data-cognigy-webchat-root] [data-cognigy-webchat] {
-        width: 100%;
-        height: 100dvh;
-        right: 0;
-        font-size: 16px;
-        position: fixed; /* 位置を固定 */
-        top: 0; /* 画面上部から配置 */
-        overflow: hidden; /* はみ出し部分を隠す */
-    }
-    [data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input {
-        bottom: 0;
-    }
+  [data-cognigy-webchat-root] [data-cognigy-webchat] {
+    width: 100%;
+    height: var(--available-viewport-height); /* 動的に計算された高さを使用 */
+    right: 0;
+    font-size: 16px;
+    position: fixed;
+    top: 0;
+    overflow: hidden;
+  }
+  
+  [data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input {
+    bottom: 0;
+  }
 }
 
 /* ヘッダーバー */
