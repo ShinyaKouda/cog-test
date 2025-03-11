@@ -16,9 +16,10 @@
 /* レスポンシブ対応：Webchatの表示サイズ（改良版） */
 @media only screen and (max-width: 768px) {
   /* ルート要素のスタイル */
-  [data-cognigy-webchat-root] {
+  [data-cognigy-webchat-root]  [data-cognigy-webchat] {
     width: 100%;
-    height: 100dvh;
+    height: 100vh;
+    bottom: 0;
     font-size: 16px;
   }
 }
