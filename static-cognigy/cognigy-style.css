@@ -22,64 +22,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    height: 100dvh; /* 新しいdvhユニットを使用（対応ブラウザ向け） */
     z-index: 1000;
     overflow: hidden;
-  }
-  
-  /* Webチャットコンテナ */
-  [data-cognigy-webchat-root] [data-cognigy-webchat] {
-    width: 100%;
-    height: 100%; /* 親要素に合わせる */
-    height: var(--available-viewport-height, 100%); /* フォールバック付き */
-    position: relative; /* fixedからrelativeに変更 */
-    font-size: 16px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  
-  /* チャット履歴コンテナ - スクロール可能領域 */
-  [data-cognigy-webchat-root] [data-cognigy-webchat] .webchat-chat-history {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* iOSでのスムーズなスクロール */
-    position: relative;
-    padding-bottom: 20px; /* 入力欄との間にスペース */
-  }
-  
-  /* 入力欄コンテナ */
-  [data-cognigy-webchat-root] [data-cognigy-webchat] .webchat-input-container {
-    position: relative; /* fixedではなくrelativeに変更 */
-    width: 100%;
-    background-color: #fff; /* 背景色を追加 */
-    border-top: 1px solid #e0e0e0; /* 区切り線を追加 */
-    padding: 8px 0;
-    z-index: 2;
-  }
-  
-  /* inputフィールド自体 */
-  [data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input {
-    position: relative;
-    bottom: 0;
-    width: 100%;
-    padding: 8px 12px;
-  }
-  
-  /* キーボード表示中のスタイル（JavaScriptで付与） */
-  [data-cognigy-webchat-root].keyboard-visible [data-cognigy-webchat] {
-    /* キーボード表示時の特別な処理 */
-    position: absolute;
-    top: 0;
-    bottom: auto;
-  }
-  
-  /* iOS Safariのための特別なスタイル */
-  @supports (-webkit-touch-callout: none) {
-    [data-cognigy-webchat-root] [data-cognigy-webchat] {
-      /* iOS固有の調整 */
-      height: -webkit-fill-available;
-    }
   }
 }
 
