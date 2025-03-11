@@ -51,11 +51,14 @@ function initChatHeightAdjustment() {
       // visualViewport APIが利用可能であれば使用（より正確）
       if (window.visualViewport) {
         chatbotContainer.style.height = `${window.visualViewport.height}px`;
+          console.log('Cognigy 入力欄がアクティブになり高さがvisualViewportに調整されました');
       } else {
         // フォールバックとしてinnerHeightを使用
         chatbotContainer.style.height = `${window.innerHeight}px`;
+        console.log('Cognigy 入力欄がアクティブになり高さがフォールバックに調整されました');
       }
     }, 300); // キーボード表示のアニメーションが完了するのを待つ
+    console.log('Cognigy 入力欄がアクティブになり高さが調整されました');
   });
 
   // 入力欄が非アクティブになったとき
