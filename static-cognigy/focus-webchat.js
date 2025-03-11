@@ -25,288 +25,308 @@ webchat.registerAnalyticsService(event => {
     }
 });
 
-// ビューポートの高さを動的に管理するクラス（改良版）
+// ビューポートとキーボード表示を管理する改良版クラス
 class ViewportHeightManager {
   constructor(targetSelector) {
+    // 設定値と初期化
     this.targetSelector = targetSelector;
+    this.rootSelector = '[data-cognigy-webchat-root]';
+    this.chatHistorySelector = '.webchat-chat-history';
+    this.inputContainerSelector = '.webchat-input-container';
+    
+    // 状態変数
     this.initialViewportHeight = window.innerHeight;
-    this.currentKeyboardHeight = 0;
     this.isKeyboardVisible = false;
-    this.lastViewportHeight = window.innerHeight;
-    this.scrollTimeoutId = null;
+    this.currentKeyboardHeight = 0;
+    this.previousScrollTop = 0;
+    this.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    this.isAndroid = /Android/.test(navigator.userAgent);
     
-    // コンテナ参照の取得
-    this.targetElements = [];
-    this.resizeObserver = null;
+    // 要素参照
+    this.rootElement = document.querySelector(this.rootSelector);
+    this.targetElement = document.querySelector(this.targetSelector);
+    this.chatHistoryElement = null;
+    this.inputContainerElement = null;
     
-    // イベントリスナーの初期化
-    this.initElements();
-    this.initListeners();
-    
-    // 初期状態で一度実行
-    this.updateHeight();
-  }
-  
-  initElements() {
-    // 対象要素の取得
-    this.targetElements = Array.from(document.querySelectorAll(this.targetSelector));
-    
-    // 対象要素がなければ再試行
-    if (this.targetElements.length === 0) {
-      setTimeout(() => this.initElements(), 100);
+    // すべての要素が存在することを確認
+    if (!this.rootElement || !this.targetElement) {
+      console.warn('要素が見つかりません。DOMの読み込み完了後に再試行します。');
+      setTimeout(() => this.init(), 500);
       return;
     }
     
-    // ResizeObserverの設定
-    this.setupResizeObserver();
+    this.init();
   }
   
-  setupResizeObserver() {
-    // 要素のサイズ変化を監視
-    if ('ResizeObserver' in window) {
-      this.resizeObserver = new ResizeObserver(entries => {
-        this.updateHeight();
-      });
-      
-      this.targetElements.forEach(element => {
-        this.resizeObserver.observe(element);
-      });
+  init() {
+    // 要素参照を更新
+    this.rootElement = document.querySelector(this.rootSelector);
+    this.targetElement = document.querySelector(this.targetSelector);
+    
+    if (!this.rootElement || !this.targetElement) {
+      console.warn('要素が見つかりません。');
+      return;
     }
+    
+    this.chatHistoryElement = this.targetElement.querySelector(this.chatHistorySelector);
+    this.inputContainerElement = this.targetElement.querySelector(this.inputContainerSelector);
+    
+    if (!this.chatHistoryElement || !this.inputContainerElement) {
+      console.warn('チャット履歴または入力欄が見つかりません。');
+      return;
+    }
+    
+    // イベントリスナーを設定
+    this.setupEventListeners();
+    
+    // 初期状態で一度計算
+    this.updateHeight();
+    
+    console.log('ViewportHeightManager 初期化完了', {
+      isIOS: this.isIOS,
+      isAndroid: this.isAndroid,
+      initialHeight: this.initialViewportHeight
+    });
   }
   
-  initListeners() {
-    // visualViewport APIを使用（モダンブラウザ）
+  setupEventListeners() {
+    // フォーカスイベントでキーボード状態を検出
+    document.addEventListener('focusin', this.handleFocusIn.bind(this));
+    document.addEventListener('focusout', this.handleFocusOut.bind(this));
+    
+    // visualViewport APIがある場合はそれを使用
     if ('visualViewport' in window) {
       window.visualViewport.addEventListener('resize', this.handleViewportResize.bind(this));
       window.visualViewport.addEventListener('scroll', this.handleViewportScroll.bind(this));
-    } 
-    // フォールバック（旧ブラウザ）
-    else {
+    } else {
+      // フォールバック
       window.addEventListener('resize', this.handleWindowResize.bind(this));
     }
     
-    // 向き変更の検出
+    // スクロールイベント
+    if (this.chatHistoryElement) {
+      this.chatHistoryElement.addEventListener('scroll', this.handleChatScroll.bind(this));
+    }
+    
+    // 向き変更イベント
     window.addEventListener('orientationchange', this.handleOrientationChange.bind(this));
     
-    // フォーカスイベントの監視（より確実にキーボードを検出）
-    document.addEventListener('focusin', this.handleFocusIn.bind(this));
-    document.addEventListener('focusout', this.handleFocusOut.bind(this));
-  }
-  
-  handleViewportResize() {
-    // デバウンス処理（頻繁なリサイズイベントを制限）
-    clearTimeout(this.resizeTimeoutId);
-    this.resizeTimeoutId = setTimeout(() => {
-      this.detectKeyboardHeight();
-      this.updateHeight();
-    }, 50);
-  }
-  
-  handleViewportScroll() {
-    // デバウンス処理（スクロールイベントを制限）
-    clearTimeout(this.scrollTimeoutId);
-    this.scrollTimeoutId = setTimeout(() => {
-      // キーボードが表示されている場合は特別処理
-      if (this.isKeyboardVisible) {
-        this.fixScrollWithKeyboard();
-      }
-      this.updateHeight();
-    }, 50);
-  }
-  
-  handleWindowResize() {
-    clearTimeout(this.resizeTimeoutId);
-    this.resizeTimeoutId = setTimeout(() => {
-      this.detectKeyboardHeightFallback();
-      this.updateHeight();
-    }, 50);
-  }
-  
-  handleOrientationChange() {
-    // 向き変更後に遅延処理
-    setTimeout(() => {
-      this.initialViewportHeight = window.innerHeight;
-      this.detectKeyboardHeight();
-      this.updateHeight();
-      
-      // 追加のリフレッシュ（デバイスによって遅延が異なる場合）
-      setTimeout(() => this.updateHeight(), 500);
-    }, 300);
+    // タッチイベント（特にiOS用）
+    if (this.isIOS) {
+      document.addEventListener('touchstart', this.handleTouchStart.bind(this));
+      document.addEventListener('touchend', this.handleTouchEnd.bind(this));
+    }
   }
   
   handleFocusIn(e) {
-    // 入力要素にフォーカスが当たった場合
+    // 入力要素にフォーカスした場合
     if (this.isInputElement(e.target)) {
       setTimeout(() => {
-        this.detectKeyboardHeight();
         this.isKeyboardVisible = true;
-        this.updateHeight();
-      }, 300); // キーボード表示を待つための遅延
+        this.detectKeyboardHeight();
+        this.applyKeyboardVisibleState();
+        this.scrollToBottom();
+      }, this.isIOS ? 300 : 100);
     }
   }
   
   handleFocusOut(e) {
     // 入力要素からフォーカスが外れた場合
     if (this.isInputElement(e.target)) {
+      // 少し遅延してキーボードが完全に閉じるのを待つ
       setTimeout(() => {
         this.isKeyboardVisible = false;
         this.currentKeyboardHeight = 0;
+        this.applyKeyboardVisibleState(false);
         this.updateHeight();
       }, 100);
     }
   }
   
+  handleViewportResize() {
+    // visualViewportのリサイズイベント
+    this.detectKeyboardHeight();
+    this.updateHeight();
+    
+    if (this.isKeyboardVisible) {
+      this.scrollToBottom();
+    }
+  }
+  
+  handleViewportScroll() {
+    // visualViewportのスクロールイベント（主にiOS用）
+    if (this.isKeyboardVisible && this.isIOS) {
+      this.scrollToBottom();
+    }
+  }
+  
+  handleWindowResize() {
+    // 通常のリサイズイベント（キーボード表示/非表示を検出）
+    const currentHeight = window.innerHeight;
+    
+    if (currentHeight < this.initialViewportHeight - 150) {
+      // キーボードが表示された可能性
+      this.isKeyboardVisible = true;
+      this.currentKeyboardHeight = this.initialViewportHeight - currentHeight;
+    } else if (currentHeight >= this.initialViewportHeight - 50) {
+      // キーボードが非表示になった可能性
+      this.isKeyboardVisible = false;
+      this.currentKeyboardHeight = 0;
+    }
+    
+    this.applyKeyboardVisibleState();
+    this.updateHeight();
+  }
+  
+  handleChatScroll() {
+    // チャット履歴のスクロールイベント
+    if (this.chatHistoryElement) {
+      this.previousScrollTop = this.chatHistoryElement.scrollTop;
+    }
+  }
+  
+  handleOrientationChange() {
+    // 向き変更イベント
+    setTimeout(() => {
+      this.initialViewportHeight = window.innerHeight;
+      this.isKeyboardVisible = false;
+      this.currentKeyboardHeight = 0;
+      this.applyKeyboardVisibleState(false);
+      this.updateHeight();
+      
+      // 向き変更後にスクロール位置をリセット
+      this.scrollToBottom();
+      
+      // さらに遅延してもう一度更新（デバイスによって必要）
+      setTimeout(() => {
+        this.updateHeight();
+        this.scrollToBottom();
+      }, 500);
+    }, 300);
+  }
+  
+  handleTouchStart() {
+    // タッチ開始（主にiOS用）
+    if (this.chatHistoryElement) {
+      this.previousScrollTop = this.chatHistoryElement.scrollTop;
+    }
+  }
+  
+  handleTouchEnd() {
+    // タッチ終了（主にiOS用）
+    if (this.isKeyboardVisible && this.isIOS) {
+      // キーボード表示中にタッチ操作があった場合、スクロール位置を調整
+      setTimeout(() => this.scrollToBottom(false), 300);
+    }
+  }
+  
   isInputElement(el) {
-    const inputTypes = ['INPUT', 'TEXTAREA', 'SELECT'];
-    return inputTypes.includes(el.tagName) || el.isContentEditable;
+    // 入力要素かどうかを判定
+    const inputTags = ['INPUT', 'TEXTAREA', 'SELECT'];
+    return inputTags.includes(el.tagName) || el.isContentEditable;
   }
   
   detectKeyboardHeight() {
+    // キーボードの高さを検出
     if ('visualViewport' in window) {
       const viewportHeight = window.visualViewport.height;
       const windowHeight = window.innerHeight;
       
-      // visualViewportの高さとwindow.innerHeightの差が大きい場合はキーボード
+      // キーボードの高さを計算（視覚的ビューポートとウィンドウの差）
       const heightDiff = windowHeight - viewportHeight;
       
-      if (heightDiff > 150) { // キーボード検出の閾値（デバイスによって調整）
+      if (heightDiff > 100) {
+        // 100px以上の差があればキーボードが表示されていると判断
         this.currentKeyboardHeight = heightDiff;
         this.isKeyboardVisible = true;
-      } else if (this.isKeyboardVisible && heightDiff < 50) {
-        // キーボードが非表示になった場合
+      } else if (heightDiff < 50 && this.isKeyboardVisible) {
+        // 差が小さくなったらキーボードが非表示になったと判断
         this.currentKeyboardHeight = 0;
         this.isKeyboardVisible = false;
       }
-      
-      this.lastViewportHeight = viewportHeight;
-    }
-  }
-  
-  detectKeyboardHeightFallback() {
-    const currentHeight = window.innerHeight;
-    
-    // 初期高さより著しく小さい場合はキーボードが表示されている可能性
-    if (currentHeight < this.initialViewportHeight - 150) {
-      this.currentKeyboardHeight = this.initialViewportHeight - currentHeight;
-      this.isKeyboardVisible = true;
     } else {
-      this.currentKeyboardHeight = 0;
-      this.isKeyboardVisible = false;
+      // フォールバック: 現在のウィンドウの高さと初期高さを比較
+      const currentHeight = window.innerHeight;
+      if (currentHeight < this.initialViewportHeight - 150) {
+        this.currentKeyboardHeight = this.initialViewportHeight - currentHeight;
+        this.isKeyboardVisible = true;
+      }
     }
   }
   
-  // キーボード表示時のスクロール問題を修正
-  fixScrollWithKeyboard() {
-    if (!this.isKeyboardVisible || this.targetElements.length === 0) return;
-    
-    const lastElement = this.targetElements[0];
-    const chatContainer = lastElement.querySelector('.webchat-chat-history') || 
-                          lastElement.querySelector('.chat-container') ||
-                          lastElement;
-                          
-    const inputContainer = lastElement.querySelector('.webchat-input-container') ||
-                          lastElement.querySelector('.input-container') ||
-                          lastElement.querySelector('input, textarea');
-    
-    if (inputContainer && chatContainer) {
-      // スクロールを最下部に固定
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-      
-      // 入力欄の位置調整
-      if (window.visualViewport) {
-        const offsetFromBottom = window.innerHeight - 
-                               (inputContainer.getBoundingClientRect().bottom + window.visualViewport.offsetTop);
-                               
-        if (offsetFromBottom < this.currentKeyboardHeight) {
-          // キーボードと入力欄の間に隙間がある場合は調整
-          inputContainer.style.bottom = `${this.currentKeyboardHeight}px`;
-        }
+  applyKeyboardVisibleState(isVisible = this.isKeyboardVisible) {
+    // キーボード表示状態をDOMに反映
+    if (this.rootElement) {
+      if (isVisible) {
+        this.rootElement.classList.add('keyboard-visible');
+      } else {
+        this.rootElement.classList.remove('keyboard-visible');
       }
     }
   }
   
   updateHeight() {
-    if (!this.targetElements.length) return;
-    
+    // 利用可能な高さを計算して適用
     let availableHeight;
     
-    // visualViewport APIがある場合はそれを使用
-    if ('visualViewport' in window) {
-      availableHeight = window.visualViewport.height;
-      
-      // iOS Safariでのスクロール時の挙動修正
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      if (isIOS && this.isKeyboardVisible) {
-        // iOSでのキーボード表示時は特別な処理
+    if (this.isKeyboardVisible) {
+      if ('visualViewport' in window) {
+        // visualViewport APIがある場合
         availableHeight = window.visualViewport.height;
+        
+        // iOSの場合は特別な計算が必要
+        if (this.isIOS) {
+          // 入力コンテナに視覚的な調整を適用
+          if (this.inputContainerElement) {
+            this.inputContainerElement.style.paddingBottom = 
+              `${Math.max(8, window.visualViewport.offsetTop)}px`;
+          }
+        }
+      } else {
+        // フォールバック
+        availableHeight = window.innerHeight - this.currentKeyboardHeight;
       }
     } else {
-      // フォールバック計算
-      availableHeight = window.innerHeight - this.currentKeyboardHeight;
+      // キーボードが非表示の場合
+      availableHeight = this.initialViewportHeight;
+      
+      // 入力コンテナのパディングをリセット
+      if (this.inputContainerElement) {
+        this.inputContainerElement.style.paddingBottom = '8px';
+      }
     }
     
-    // マイナス値防止
-    availableHeight = Math.max(availableHeight, 200); // 最低高さ200px
+    // 最小値を確保
+    availableHeight = Math.max(availableHeight, 300);
     
     // CSSカスタムプロパティを設定
     document.documentElement.style.setProperty('--available-viewport-height', `${availableHeight}px`);
     
-    // 対象の要素に適用
-    this.targetElements.forEach(element => {
-      // 高さを設定
-      element.style.height = `${availableHeight}px`;
+    // ログ出力
+    console.log(`高さ更新: ${availableHeight}px (キーボード: ${this.isKeyboardVisible ? 'あり' : 'なし'}, 高さ: ${this.currentKeyboardHeight}px)`);
+  }
+  
+  scrollToBottom(instant = true) {
+    // チャット履歴を最下部にスクロール
+    if (this.chatHistoryElement) {
+      const scrollOptions = {
+        behavior: instant ? 'auto' : 'smooth'
+      };
       
-      // スクロール位置の修正（キーボード表示時）
-      if (this.isKeyboardVisible) {
-        const chatContainer = element.querySelector('.webchat-chat-history') || 
-                              element.querySelector('.chat-container');
-        if (chatContainer) {
-          // 自動スクロールを適用
-          setTimeout(() => {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-          }, 50);
-        }
-      }
-    });
-    
-    // キーボード表示中の固定位置要素調整
-    if (this.isKeyboardVisible) {
-      this.adjustFixedElements();
-    } else {
-      this.resetFixedElements();
+      this.chatHistoryElement.scrollTop = this.chatHistoryElement.scrollHeight;
+      
+      // 一部のブラウザではもう一度遅延実行が必要
+      setTimeout(() => {
+        this.chatHistoryElement.scrollTop = this.chatHistoryElement.scrollHeight;
+      }, 50);
     }
-    
-    // デバッグ用
-    console.log(`利用可能な高さ: ${availableHeight}px (キーボード表示: ${this.isKeyboardVisible}, キーボード高さ: ${this.currentKeyboardHeight}px)`);
-  }
-  
-  // 固定位置要素の調整（キーボード表示時）
-  adjustFixedElements() {
-    const fixedInputs = document.querySelectorAll('.webchat-input-container, .input-container');
-    fixedInputs.forEach(el => {
-      if (window.getComputedStyle(el).position === 'fixed') {
-        el.style.position = 'absolute';
-        el.style.bottom = `${this.currentKeyboardHeight}px`;
-      }
-    });
-  }
-  
-  // 固定位置要素のリセット
-  resetFixedElements() {
-    const fixedInputs = document.querySelectorAll('.webchat-input-container, .input-container');
-    fixedInputs.forEach(el => {
-      if (el.style.position === 'absolute') {
-        el.style.position = '';
-        el.style.bottom = '';
-      }
-    });
   }
 }
 
-// WebChatが読み込まれたタイミングでインスタンスを作成
+// DOMの読み込み完了後に初期化
 document.addEventListener('DOMContentLoaded', () => {
-  // DOMが完全に読み込まれるのを待つ
+  // 初期化を少し遅延（DOMが完全に構築されるのを待つ）
   setTimeout(() => {
-    const webchatManager = new ViewportHeightManager('[data-cognigy-webchat]');
-  }, 300);
+    const manager = new ViewportHeightManager('[data-cognigy-webchat]');
+  }, 500);
 });
