@@ -43,6 +43,7 @@ chatInput.addEventListener('focus', () => {
       // フォールバックとしてinnerHeightを使用
       chatbotContainer.style.height = `${window.innerHeight}px`;
     }
+    chatbotContainer.style.height = `200px`
   }, 300); // キーボード表示のアニメーションが完了するのを待つ
 });
 
