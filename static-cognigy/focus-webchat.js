@@ -15,10 +15,12 @@ webchat.registerAnalyticsService(event => {
         // デバッグパネルを作成
         createDebugPanel();
         console.log('Cognigyデバッグ用パネルを表示。');
+        console.log('chatInput：'+!chatInput);
     }
 
     // メッセージを受信したときの処理
     if (event.type === "webchat/incoming-message") {
+        console.log('Cognigyボットがメッセージを送信。');
         setTimeout(() => {
 
             var chatContainer = document.querySelector('.webchat-chat-history');
