@@ -6,8 +6,8 @@ webchat.registerAnalyticsService(event => {
     // 無い場合は最初のボットのメッセージが一番上に来るようにする
     if (event.type === "webchat/incoming-message") {
         setTimeout(() => {
-            const chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-            const chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+            let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
+            let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
             // Cognigyウェブチャットの要素を取得
             console.log(chatbotContainer);
             console.log(chatInput);
