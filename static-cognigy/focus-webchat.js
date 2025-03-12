@@ -103,14 +103,55 @@ function createDebugPanel() {
     // すでに存在する場合は作成しない
     if (document.getElementById('debug-panel')) return;
 
-    // パネル要素の作成
+    // コントロールパネル（ボタン用のコンテナ）を作成
+    const controlPanel = document.createElement('div');
+    controlPanel.id = 'debug-control-panel';
+    controlPanel.style.cssText = `
+    position: fixed;
+    bottom: 60px; /* チャット入力欄の上にくるように位置調整 */
+    left: 0;
+    width: 100%;
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: flex-end;
+    z-index: 10001;
+  `;
+    document.body.appendChild(controlPanel);
+
+    // クリアボタンを追加
+    const clearButton = document.createElement('button');
+    clearButton.textContent = 'クリア';
+    clearButton.style.cssText = `
+    padding: 5px 10px;
+    margin-right: 10px;
+    background: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 3px;
+  `;
+    controlPanel.appendChild(clearButton);
+
+    // パネルの表示/非表示切り替えボタン
+    const toggleButton = document.createElement('button');
+    toggleButton.textContent = '非表示';
+    toggleButton.style.cssText = `
+    padding: 5px 10px;
+    background: #5bc0de;
+    color: white;
+    border: none;
+    border-radius: 3px;
+  `;
+    controlPanel.appendChild(toggleButton);
+
+    // ログパネル要素の作成
     const debugPanel = document.createElement('div');
     debugPanel.id = 'debug-panel';
 
-    // スタイルの設定
+    // スタイルの設定 - コントロールパネルの上に配置
     debugPanel.style.cssText = `
     position: fixed;
-    bottom: 50vh;
+    bottom: 95px; /* コントロールパネル+入力欄の高さ分の上に配置 */
     left: 0;
     width: 100%;
     max-height: 40vh;
@@ -166,40 +207,7 @@ function createDebugPanel() {
         return false; // デフォルトのエラー処理も実行
     };
 
-    // クリアボタンを追加
-    const clearButton = document.createElement('button');
-    clearButton.textContent = 'クリア';
-    clearButton.style.cssText = `
-    position: fixed;
-    bottom: 40vh;
-    right: 10px;
-    padding: 5px 10px;
-    background: #d9534f;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    z-index: 10001;
-  `;
-    clearButton.onclick = function () {
-        debugPanel.innerHTML = '';
-    };
-    document.body.appendChild(clearButton);
-
-    // パネルの表示/非表示切り替えボタン
-    const toggleButton = document.createElement('button');
-    toggleButton.textContent = '非表示';
-    toggleButton.style.cssText = `
-    position: fixed;
-    bottom: 40vh;
-    right: 70px;
-    padding: 5px 10px;
-    background: #5bc0de;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    z-index: 10001;
-  `;
-
+    // ボタンの機能を設定
     let isPanelVisible = true;
     toggleButton.onclick = function () {
         if (isPanelVisible) {
@@ -211,7 +219,10 @@ function createDebugPanel() {
         }
         isPanelVisible = !isPanelVisible;
     };
-    document.body.appendChild(toggleButton);
+
+    clearButton.onclick = function () {
+        debugPanel.innerHTML = '';
+    };
 
     return debugPanel;
 }
