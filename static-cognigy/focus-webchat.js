@@ -37,9 +37,10 @@ function initChatHeightAdjustment() {
     return;
   }
   console.log('Cognigy要素が見つかりました。リスナーを設定します。');
+  setTimeout(initChatHeightAdjustment, 500); // 500ミリ秒後に再試行
 
-  let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-  let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+  chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
+  chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
   
   // 初期の高さを保存
   let originalHeight = window.innerHeight;
