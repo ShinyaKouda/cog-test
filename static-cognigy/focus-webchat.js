@@ -112,39 +112,61 @@ function setupEventListeners() {
         return;
     }
     
-    // より簡単なフォーカスイベント検知のため、documentレベルのイベントも追加
+    // 以下の二つのイベントリスナーをdocumentレベルで設定
     document.addEventListener('focusin', function(e) {
         console.log(`フォーカスIN: ${e.target.tagName} 要素がフォーカスされました`);
+        
+        // チャット入力欄にフォーカスが当たった場合の処理
+        if (e.target === chatInput || chatInput.contains(e.target)) {
+            console.log("chatInput にフォーカスしました (focusin経由)");
+            // 初期の高さを保存
+            originalHeight = window.innerHeight;
+            if (chatbotContainer) {
+                chatbotContainer.style.height = `${originalHeight}px`;
+                console.log(`高さを ${originalHeight}px に設定しました`);
+            
+                // 少し遅延させて、キーボードが表示された後の高さを取得
+                setTimeout(() => {
+                    // visualViewport APIが利用可能であれば使用（より正確）
+                    if (window.visualViewport) {
+                        chatbotContainer.style.height = `${window.visualViewport.height}px`;
+                        console.log(`高さを visualViewport の ${window.visualViewport.height}px に調整しました`);
+                    } else {
+                        // フォールバックとしてinnerHeightを使用
+                        chatbotContainer.style.height = `${window.innerHeight}px`;
+                        console.log(`高さを innerHeight の ${window.innerHeight}px に調整しました`);
+                    }
+                }, 300); // キーボード表示のアニメーションが完了するのを待つ
+            } else {
+                console.log("chatbotContainer が未取得のため高さ調整はスキップします");
+            }
+        }
     });
     
     document.addEventListener('focusout', function(e) {
         console.log(`フォーカスOUT: ${e.target.tagName} 要素からフォーカスが外れました`);
-    });
-
-    // 入力欄がアクティブになったとき
-    chatInput.addEventListener('focus', function() {
-        console.log("chatInput にフォーカスしました");
-        // 初期の高さを保存
-        originalHeight = window.innerHeight;
-        if (chatbotContainer) {
-            chatbotContainer.style.height = `${originalHeight}px`;
-            console.log(`高さを ${originalHeight}px に設定しました`);
-        } else {
-            console.log("chatbotContainer が未取得のため高さ調整はスキップします");
+        
+        // チャット入力欄からフォーカスが外れた場合の処理
+        if (e.target === chatInput || chatInput.contains(e.target)) {
+            console.log("chatInput からフォーカスが外れました (focusout経由)");
+            setTimeout(() => {
+                if (chatbotContainer) {
+                    chatbotContainer.style.height = `${originalHeight}px`;
+                    console.log(`高さを ${originalHeight}px に戻しました`);
+                } else {
+                    console.log("chatbotContainer が未取得のため高さ調整はスキップします");
+                }
+            }, 100);
         }
     });
 
-    // 入力欄が非アクティブになったとき
+    // 互換性のため元のイベントも残しておく（万が一動作するようになったとき用）
+    chatInput.addEventListener('focus', function() {
+        console.log("chatInput にフォーカスしました (focus経由)");
+    });
+
     chatInput.addEventListener('blur', function() {
-        console.log("chatInput からフォーカスが外れました");
-        setTimeout(() => {
-            if (chatbotContainer) {
-                chatbotContainer.style.height = `${originalHeight}px`;
-                console.log(`高さを ${originalHeight}px に戻しました`);
-            } else {
-                console.log("chatbotContainer が未取得のため高さ調整はスキップします");
-            }
-        }, 100);
+        console.log("chatInput からフォーカスが外れました (blur経由)");
     });
     
     // 入力イベントもテスト
