@@ -110,7 +110,7 @@ function createDebugPanel() {
     // スタイルの設定
     debugPanel.style.cssText = `
     position: fixed;
-    bottom: 0;
+    bottom: 100;
     left: 0;
     width: 100%;
     max-height: 40vh;
