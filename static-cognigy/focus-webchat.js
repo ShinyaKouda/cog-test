@@ -136,3 +136,125 @@ if (document.readyState === 'loading') {
     watchForChatElements();
   }
 }
+
+
+// デバッグパネルを作成する関数
+function createDebugPanel() {
+  // パネル要素の作成
+  const debugPanel = document.createElement('div');
+  debugPanel.id = 'debug-panel';
+  
+  // スタイルの設定
+  debugPanel.style.cssText = `
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: 40vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 10px;
+    overflow-y: auto;
+    z-index: 10000;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+  `;
+  
+  // ボディに追加
+  document.body.appendChild(debugPanel);
+  
+  // 元のconsole.logメソッドを保存
+  const originalLog = console.log;
+  
+  // console.logをオーバーライド
+  console.log = function() {
+    // 元のconsole.logを呼び出し
+    originalLog.apply(console, arguments);
+    
+    // 引数を文字列化
+    const message = Array.from(arguments).map(arg => {
+      if (typeof arg === 'object' && arg !== null) {
+        return JSON.stringify(arg);
+      }
+      return String(arg);
+    }).join(' ');
+    
+    // メッセージをパネルに追加
+    const logLine = document.createElement('div');
+    logLine.style.borderBottom = '1px solid #444';
+    logLine.style.padding = '4px 0';
+    logLine.textContent = message;
+    
+    // タイムスタンプを追加（オプション）
+    const timestamp = new Date().toTimeString().split(' ')[0];
+    logLine.textContent = `[${timestamp}] ${message}`;
+    
+    // パネルに追加
+    debugPanel.appendChild(logLine);
+    
+    // 自動スクロール
+    debugPanel.scrollTop = debugPanel.scrollHeight;
+  };
+  
+  // エラーもキャプチャする（オプション）
+  window.onerror = function(message, source, lineno, colno, error) {
+    console.log(`ERROR: ${message} at ${source}:${lineno}:${colno}`);
+    return false; // デフォルトのエラー処理も実行
+  };
+  
+  // クリアボタンを追加
+  const clearButton = document.createElement('button');
+  clearButton.textContent = 'クリア';
+  clearButton.style.cssText = `
+    position: fixed;
+    bottom: 40vh;
+    right: 10px;
+    padding: 5px 10px;
+    background: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    z-index: 10001;
+  `;
+  clearButton.onclick = function() {
+    debugPanel.innerHTML = '';
+  };
+  document.body.appendChild(clearButton);
+  
+  // パネルの表示/非表示切り替えボタン
+  const toggleButton = document.createElement('button');
+  toggleButton.textContent = '非表示';
+  toggleButton.style.cssText = `
+    position: fixed;
+    bottom: 40vh;
+    right: 70px;
+    padding: 5px 10px;
+    background: #5bc0de;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    z-index: 10001;
+  `;
+  
+  let isPanelVisible = true;
+  toggleButton.onclick = function() {
+    if (isPanelVisible) {
+      debugPanel.style.display = 'none';
+      toggleButton.textContent = '表示';
+    } else {
+      debugPanel.style.display = 'block';
+      toggleButton.textContent = '非表示';
+    }
+    isPanelVisible = !isPanelVisible;
+  };
+  document.body.appendChild(toggleButton);
+  
+  return debugPanel;
+}
+
+// ページ読み込み完了時にデバッグパネルを作成
+document.addEventListener('DOMContentLoaded', function() {
+  createDebugPanel();
+  console.log('デバッグパネルが初期化されました');
+});
