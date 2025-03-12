@@ -5,6 +5,10 @@ webchat.registerAnalyticsService(event => {
     if (event.type === "webchat/incoming-message") {
         setTimeout(() => {
 
+            let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
+            let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+            console.log(chatInput);
+
             var chatContainer = document.querySelector('.webchat-chat-history');
             var userMessages = document.querySelectorAll('.regular-message.user');
             var targetElement;
@@ -25,10 +29,7 @@ webchat.registerAnalyticsService(event => {
             }
         }, 100);
     }
-
-    let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-    let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
-    console.log(chatInput);
+    
     // 入力欄がアクティブになったとき
     chatInput.addEventListener('focus', () => {
 
