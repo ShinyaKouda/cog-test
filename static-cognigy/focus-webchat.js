@@ -28,31 +28,31 @@ webchat.registerAnalyticsService(event => {
                 chatContainer.scrollTop = topPosition;
             }
         }, 100);
-    }
+    } else {
     
-    // 入力欄がアクティブになったとき
-    chatInput.addEventListener('focus', () => {
-
-
-        // 初期の高さを保存
-        let originalHeight = window.innerHeight;
-        chatbotContainer.style.height = `${originalHeight}px`;
-
-        // 少し遅延させて、キーボードが表示された後の高さを取得
-        console.log('Cognigy 入力欄がアクティブになりました！！！');
-        setTimeout(() => {
-            // visualViewport APIが利用可能であれば使用（より正確）
-            if (window.visualViewport) {
-                chatbotContainer.style.height = `${window.visualViewport.height}px`;
-                console.log('Cognigy 入力欄がアクティブになり高さがvisualViewportに調整されました');
-            } else {
-                // フォールバックとしてinnerHeightを使用
-                chatbotContainer.style.height = `${window.innerHeight}px`;
-                console.log('Cognigy 入力欄がアクティブになり高さがフォールバックに調整されました');
-            }
-        }, 300); // キーボード表示のアニメーションが完了するのを待つ
-        console.log('Cognigy 入力欄がアクティブになり高さが調整されました');
-
+        // 入力欄がアクティブになったとき
+        chatInput.addEventListener('focus', () => {
+    
+    
+            // 初期の高さを保存
+            let originalHeight = window.innerHeight;
+            chatbotContainer.style.height = `${originalHeight}px`;
+    
+            // 少し遅延させて、キーボードが表示された後の高さを取得
+            console.log('Cognigy 入力欄がアクティブになりました！！！');
+            setTimeout(() => {
+                // visualViewport APIが利用可能であれば使用（より正確）
+                if (window.visualViewport) {
+                    chatbotContainer.style.height = `${window.visualViewport.height}px`;
+                    console.log('Cognigy 入力欄がアクティブになり高さがvisualViewportに調整されました');
+                } else {
+                    // フォールバックとしてinnerHeightを使用
+                    chatbotContainer.style.height = `${window.innerHeight}px`;
+                    console.log('Cognigy 入力欄がアクティブになり高さがフォールバックに調整されました');
+                }
+            }, 300); // キーボード表示のアニメーションが完了するのを待つ
+            console.log('Cognigy 入力欄がアクティブになり高さが調整されました');
+        }
     });
 
     // 入力欄が非アクティブになったとき
