@@ -4,6 +4,8 @@ webchat.registerAnalyticsService(event => {
     // 無い場合は最初のボットのメッセージが一番上に来るようにする
     if (event.type === "webchat/incoming-message") {
         setTimeout(() => {
+            // デバッグパネルを作成
+            createDebugPanel();
 
             let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
             let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
@@ -200,6 +202,3 @@ function createDebugPanel() {
 
     return debugPanel;
 }
-
-// デバッグパネルを作成
-createDebugPanel();
