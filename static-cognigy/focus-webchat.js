@@ -4,44 +4,100 @@ let chatInput;
 let originalHeight;
 
 webchat.registerAnalyticsService(event => {
+    
+    console.log(`Analytics event detected: ${event.type}`);
+    
     // 初期化処理（最初の1回だけ実行するもの）
     if (!chatbotContainer) {
-        chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-        chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
-        originalHeight = window.innerHeight;
-        
-        // イベントリスナーの設定（1回だけ行う）
-        setupEventListeners();
         // デバッグパネルを作成
         createDebugPanel();
-        console.log('Cognigyデバッグ用パネルを表示。');
-        console.log('chatInput：'+!chatInput);
+        
+        console.log("初期化を開始します");
+        
+        // DOMContentLoaded に相当する処理をここで行う
+        window.setTimeout(() => {
+            console.log("DOM要素の取得を試みます");
+            chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
+            
+            if (chatbotContainer) {
+                console.log("chatbotContainer を取得しました");
+            } else {
+                console.log("chatbotContainer の取得に失敗しました");
+            }
+            
+            chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+            
+            if (chatInput) {
+                console.log("chatInput を取得しました");
+            } else {
+                console.log("chatInput の取得に失敗しました");
+                // もっと一般的なセレクタを試してみる
+                chatInput = document.querySelector('input') || document.querySelector('textarea');
+                if (chatInput) {
+                    console.log("代替の入力要素を取得しました");
+                }
+            }
+            
+            originalHeight = window.innerHeight;
+            console.log(`初期の高さ: ${originalHeight}px`);
+            
+            // 基本的なクリックイベントを追加してみる
+            document.addEventListener('click', function(e) {
+                console.log(`クリックイベントを検知: x=${e.clientX}, y=${e.clientY}`);
+            });
+            
+            // ボディ要素にイベントを追加
+            document.body.addEventListener('mousemove', throttle(function(e) {
+                console.log(`マウス移動: x=${e.clientX}, y=${e.clientY}`);
+            }, 1000)); // 1秒ごとに制限
+            
+            // ウィンドウサイズ変更イベント
+            window.addEventListener('resize', throttle(function() {
+                console.log(`ウィンドウサイズ変更: ${window.innerWidth}x${window.innerHeight}`);
+            }, 500));
+            
+            // イベントリスナーの設定（1回だけ行う）
+            setupEventListeners();
+
+        }, 1000); // 1秒待ってから実行
     }
 
     // メッセージを受信したときの処理
     if (event.type === "webchat/incoming-message") {
-        console.log('Cognigyボットがメッセージを送信。');
+        console.log("受信メッセージを検知しました");
         setTimeout(() => {
 
+            console.log("メッセージ処理を開始します");
             var chatContainer = document.querySelector('.webchat-chat-history');
+            if (!chatContainer) {
+                console.log("chatContainer が見つかりません");
+                return;
+            }
+            
             var userMessages = document.querySelectorAll('.regular-message.user');
             var targetElement;
 
             if (userMessages.length > 0) {
+                console.log(`ユーザーメッセージを ${userMessages.length} 件見つけました`);
                 // ユーザーメッセージがある場合は最後のユーザーメッセージを取得
                 targetElement = userMessages[userMessages.length - 1];
             } else {
+                console.log("ユーザーメッセージが見つからないため、ボットメッセージを探します");
                 // ユーザーメッセージがない場合は最初のボットのメッセージを取得
                 var botMessages = document.querySelectorAll('.regular-message.bot');
                 if (botMessages.length > 0) {
+                    console.log(`ボットメッセージを ${botMessages.length} 件見つけました`);
                     targetElement = botMessages[0];
                 }
             }
 
             if (targetElement) {
+                console.log("スクロール位置を調整します");
                 // 要素の上端の位置を取得してスクロールする
                 var topPosition = targetElement.offsetTop - targetElement.offsetHeight;
                 chatContainer.scrollTop = topPosition;
+            } else {
+                console.log("スクロール対象の要素が見つかりません");
             }
         }, 100);
     }
@@ -49,62 +105,62 @@ webchat.registerAnalyticsService(event => {
 
 // イベントリスナーの設定を行う関数
 function setupEventListeners() {
-    if (!chatInput) return;
+    console.log("イベントリスナーのセットアップを開始します");
+    
+    if (!chatInput) {
+        console.log("chatInput が未取得のためイベントリスナーは設定できません");
+        return;
+    }
+    
+    // より簡単なフォーカスイベント検知のため、documentレベルのイベントも追加
+    document.addEventListener('focusin', function(e) {
+        console.log(`フォーカスIN: ${e.target.tagName} 要素がフォーカスされました`);
+    });
+    
+    document.addEventListener('focusout', function(e) {
+        console.log(`フォーカスOUT: ${e.target.tagName} 要素からフォーカスが外れました`);
+    });
 
     // 入力欄がアクティブになったとき
-    chatInput.addEventListener('focus', () => {
+    chatInput.addEventListener('focus', function() {
+        console.log("chatInput にフォーカスしました");
         // 初期の高さを保存
         originalHeight = window.innerHeight;
-        chatbotContainer.style.height = `${originalHeight}px`;
-
-        // 少し遅延させて、キーボードが表示された後の高さを取得
-        console.log('Cognigy 入力欄がアクティブになりました！！！');
-        setTimeout(() => {
-            // visualViewport APIが利用可能であれば使用（より正確）
-            if (window.visualViewport) {
-                chatbotContainer.style.height = `${window.visualViewport.height}px`;
-                console.log('Cognigy 入力欄がアクティブになり高さがvisualViewportに調整されました');
-            } else {
-                // フォールバックとしてinnerHeightを使用
-                chatbotContainer.style.height = `${window.innerHeight}px`;
-                console.log('Cognigy 入力欄がアクティブになり高さがフォールバックに調整されました');
-            }
-        }, 300); // キーボード表示のアニメーションが完了するのを待つ
-        console.log('Cognigy 入力欄がアクティブになり高さが調整されました');
-    });
-
-    // 入力欄が非アクティブになったとき
-    chatInput.addEventListener('blur', () => {
-        // 元の高さに戻す
-        setTimeout(() => {
+        if (chatbotContainer) {
             chatbotContainer.style.height = `${originalHeight}px`;
-        }, 100); // 少し遅延させて、UIの更新タイミングを調整
-    });
-
-    // 画面サイズが変わったとき（向きの変更など）
-    window.addEventListener('resize', () => {
-        // アクティブ要素がチャット入力欄でない場合のみ基準値を更新
-        if (document.activeElement !== chatInput) {
-            originalHeight = window.innerHeight;
-            chatbotContainer.style.height = `${originalHeight}px`;
+            console.log(`高さを ${originalHeight}px に設定しました`);
+        } else {
+            console.log("chatbotContainer が未取得のため高さ調整はスキップします");
         }
     });
 
-    // visualViewport APIが使える場合は、より精密な調整が可能
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
-            // 入力欄がアクティブな場合のみ高さを調整
-            if (document.activeElement === chatInput) {
-                chatbotContainer.style.height = `${window.visualViewport.height}px`;
+    // 入力欄が非アクティブになったとき
+    chatInput.addEventListener('blur', function() {
+        console.log("chatInput からフォーカスが外れました");
+        setTimeout(() => {
+            if (chatbotContainer) {
+                chatbotContainer.style.height = `${originalHeight}px`;
+                console.log(`高さを ${originalHeight}px に戻しました`);
+            } else {
+                console.log("chatbotContainer が未取得のため高さ調整はスキップします");
             }
-        });
-    }
+        }, 100);
+    });
+    
+    // 入力イベントもテスト
+    chatInput.addEventListener('input', throttle(function() {
+        console.log("入力イベントを検知しました");
+    }, 500));
+
+    console.log("イベントリスナーのセットアップが完了しました");
 }
 
 // デバッグパネルを作成する関数
 function createDebugPanel() {
     // すでに存在する場合は作成しない
     if (document.getElementById('debug-panel')) return;
+    
+    console.log("デバッグパネルを作成します");
 
     // コントロールパネル（ボタン用のコンテナ）を作成
     const controlPanel = document.createElement('div');
@@ -147,6 +203,33 @@ function createDebugPanel() {
   `;
     controlPanel.appendChild(toggleButton);
 
+    // テストボタンを追加
+    const testButton = document.createElement('button');
+    testButton.textContent = 'イベントテスト';
+    testButton.style.cssText = `
+    padding: 5px 10px;
+    margin-right: 10px;
+    background: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 3px;
+  `;
+    testButton.onclick = function() {
+        console.log("テストボタンがクリックされました");
+        // 強制的にイベントを発火させてみる
+        if (chatInput) {
+            chatInput.focus();
+            console.log("chatInput に強制フォーカスしました");
+            setTimeout(() => {
+                document.body.click();
+                console.log("bodyをクリックしてフォーカスを外しました");
+            }, 1000);
+        } else {
+            console.log("chatInput が取得できていないためテストできません");
+        }
+    };
+    controlPanel.appendChild(testButton);
+
     // ログパネル要素の作成
     const debugPanel = document.createElement('div');
     debugPanel.id = 'debug-panel';
@@ -182,7 +265,11 @@ function createDebugPanel() {
         // 引数を文字列化
         const message = Array.from(arguments).map(arg => {
             if (typeof arg === 'object' && arg !== null) {
-                return JSON.stringify(arg);
+                try {
+                    return JSON.stringify(arg);
+                } catch (e) {
+                    return "[Object]";
+                }
             }
             return String(arg);
         }).join(' ');
@@ -204,7 +291,7 @@ function createDebugPanel() {
         debugPanel.scrollTop = debugPanel.scrollHeight;
     };
 
-    // エラーもキャプチャする（オプション）
+    // エラーもキャプチャする
     window.onerror = function (message, source, lineno, colno, error) {
         console.log(`ERROR: ${message} at ${source}:${lineno}:${colno}`);
         return false; // デフォルトのエラー処理も実行
@@ -213,6 +300,7 @@ function createDebugPanel() {
     // ボタンの機能を設定
     let isPanelVisible = true;
     toggleButton.onclick = function () {
+        console.log("表示/非表示ボタンがクリックされました");
         if (isPanelVisible) {
             debugPanel.style.display = 'none';
             toggleButton.textContent = '表示';
@@ -224,8 +312,32 @@ function createDebugPanel() {
     };
 
     clearButton.onclick = function () {
+        console.log("クリアボタンがクリックされました");
         debugPanel.innerHTML = '';
     };
 
+    console.log("デバッグパネルの作成が完了しました");
     return debugPanel;
+}
+
+// ヘルパー関数: イベント発火頻度を制限する throttle 関数
+function throttle(func, limit) {
+    let lastFunc;
+    let lastRan;
+    return function() {
+        const context = this;
+        const args = arguments;
+        if (!lastRan) {
+            func.apply(context, args);
+            lastRan = Date.now();
+        } else {
+            clearTimeout(lastFunc);
+            lastFunc = setTimeout(function() {
+                if ((Date.now() - lastRan) >= limit) {
+                    func.apply(context, args);
+                    lastRan = Date.now();
+                }
+            }, limit - (Date.now() - lastRan));
+        }
+    };
 }
