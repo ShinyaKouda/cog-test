@@ -28,16 +28,18 @@ webchat.registerAnalyticsService(event => {
 // Cognigyウェブチャットの初期化を待つ関数
 function initChatHeightAdjustment() {
   // Cognigyウェブチャットの要素を取得
-  const chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-  const chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+  let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
+  let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
   
   // 要素が見つからない場合は、再試行する
   if (!chatbotContainer || !chatInput) {
     setTimeout(initChatHeightAdjustment, 500); // 500ミリ秒後に再試行
     return;
   }
-  
   console.log('Cognigy要素が見つかりました。リスナーを設定します。');
+
+  let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
+  let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
   
   // 初期の高さを保存
   let originalHeight = window.innerHeight;
