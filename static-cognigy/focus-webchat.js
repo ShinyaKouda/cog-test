@@ -41,6 +41,8 @@ function initChatHeightAdjustment() {
 
   chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
   chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+  console.log(chatbotContainer);
+  console.log(chatInput);
   
   // 初期の高さを保存
   let originalHeight = window.innerHeight;
