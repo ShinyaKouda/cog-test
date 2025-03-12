@@ -36,10 +36,6 @@ webchat.registerAnalyticsService(event => {
 
 // Cognigyウェブチャットの初期化を待つ関数
 function initChatHeightAdjustment() {
-
-  const chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-  const chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
-  
   
   // 要素が見つからない場合は、再試行する
   if (!chatbotContainer || !chatInput) {
