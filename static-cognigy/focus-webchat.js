@@ -1,15 +1,24 @@
-webchat.registerAnalyticsService(event => {
+// グローバル変数の宣言
+let chatbotContainer;
+let chatInput;
+let originalHeight;
 
-    // メッセージを受信したときは、ユーザーのメッセージがある場合は最後のユーザーのメッセージが一番上に、
-    // 無い場合は最初のボットのメッセージが一番上に来るようにする
+webchat.registerAnalyticsService(event => {
+    // 初期化処理（最初の1回だけ実行するもの）
+    if (!chatbotContainer) {
+        chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
+        chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+        originalHeight = window.innerHeight;
+        
+        // イベントリスナーの設定（1回だけ行う）
+        setupEventListeners();
+    }
+
+    // メッセージを受信したときの処理
     if (event.type === "webchat/incoming-message") {
         setTimeout(() => {
             // デバッグパネルを作成
             createDebugPanel();
-
-            let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-            let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
-            console.log(chatInput);
 
             var chatContainer = document.querySelector('.webchat-chat-history');
             var userMessages = document.querySelectorAll('.regular-message.user');
@@ -21,7 +30,9 @@ webchat.registerAnalyticsService(event => {
             } else {
                 // ユーザーメッセージがない場合は最初のボットのメッセージを取得
                 var botMessages = document.querySelectorAll('.regular-message.bot');
-                targetElement = botMessages[0];
+                if (botMessages.length > 0) {
+                    targetElement = botMessages[0];
+                }
             }
 
             if (targetElement) {
@@ -30,32 +41,34 @@ webchat.registerAnalyticsService(event => {
                 chatContainer.scrollTop = topPosition;
             }
         }, 100);
-    } else {
-    
-        // 入力欄がアクティブになったとき
-        chatInput.addEventListener('focus', () => {
-    
-    
-            // 初期の高さを保存
-            let originalHeight = window.innerHeight;
-            chatbotContainer.style.height = `${originalHeight}px`;
-    
-            // 少し遅延させて、キーボードが表示された後の高さを取得
-            console.log('Cognigy 入力欄がアクティブになりました！！！');
-            setTimeout(() => {
-                // visualViewport APIが利用可能であれば使用（より正確）
-                if (window.visualViewport) {
-                    chatbotContainer.style.height = `${window.visualViewport.height}px`;
-                    console.log('Cognigy 入力欄がアクティブになり高さがvisualViewportに調整されました');
-                } else {
-                    // フォールバックとしてinnerHeightを使用
-                    chatbotContainer.style.height = `${window.innerHeight}px`;
-                    console.log('Cognigy 入力欄がアクティブになり高さがフォールバックに調整されました');
-                }
-            }, 300); // キーボード表示のアニメーションが完了するのを待つ
-            console.log('Cognigy 入力欄がアクティブになり高さが調整されました');
-        });
-    };
+    }
+});
+
+// イベントリスナーの設定を行う関数
+function setupEventListeners() {
+    if (!chatInput) return;
+
+    // 入力欄がアクティブになったとき
+    chatInput.addEventListener('focus', () => {
+        // 初期の高さを保存
+        originalHeight = window.innerHeight;
+        chatbotContainer.style.height = `${originalHeight}px`;
+
+        // 少し遅延させて、キーボードが表示された後の高さを取得
+        console.log('Cognigy 入力欄がアクティブになりました！！！');
+        setTimeout(() => {
+            // visualViewport APIが利用可能であれば使用（より正確）
+            if (window.visualViewport) {
+                chatbotContainer.style.height = `${window.visualViewport.height}px`;
+                console.log('Cognigy 入力欄がアクティブになり高さがvisualViewportに調整されました');
+            } else {
+                // フォールバックとしてinnerHeightを使用
+                chatbotContainer.style.height = `${window.innerHeight}px`;
+                console.log('Cognigy 入力欄がアクティブになり高さがフォールバックに調整されました');
+            }
+        }, 300); // キーボード表示のアニメーションが完了するのを待つ
+        console.log('Cognigy 入力欄がアクティブになり高さが調整されました');
+    });
 
     // 入力欄が非アクティブになったとき
     chatInput.addEventListener('blur', () => {
@@ -83,13 +96,13 @@ webchat.registerAnalyticsService(event => {
             }
         });
     }
-});
-
-
-
+}
 
 // デバッグパネルを作成する関数
 function createDebugPanel() {
+    // すでに存在する場合は作成しない
+    if (document.getElementById('debug-panel')) return;
+
     // パネル要素の作成
     const debugPanel = document.createElement('div');
     debugPanel.id = 'debug-panel';
