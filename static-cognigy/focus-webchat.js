@@ -28,6 +28,7 @@ webchat.registerAnalyticsService(event => {
 
     let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
     let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+    console.log(chatInput);
     // 入力欄がアクティブになったとき
     chatInput.addEventListener('focus', () => {
 
