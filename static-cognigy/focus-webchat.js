@@ -54,8 +54,8 @@ webchat.registerAnalyticsService(event => {
                 }
             }, 300); // キーボード表示のアニメーションが完了するのを待つ
             console.log('Cognigy 入力欄がアクティブになり高さが調整されました');
-        }
-    });
+        });
+    };
 
     // 入力欄が非アクティブになったとき
     chatInput.addEventListener('blur', () => {
