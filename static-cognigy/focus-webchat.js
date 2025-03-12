@@ -33,7 +33,6 @@ function initChatHeightAdjustment() {
   
   // 要素が見つからない場合は、再試行する
   if (!chatbotContainer || !chatInput) {
-    console.log('Cognigy要素がまだ読み込まれていません。再試行します...');
     setTimeout(initChatHeightAdjustment, 500); // 500ミリ秒後に再試行
     return;
   }
@@ -47,6 +46,7 @@ function initChatHeightAdjustment() {
   // 入力欄がアクティブになったとき
   chatInput.addEventListener('focus', () => {
     // 少し遅延させて、キーボードが表示された後の高さを取得
+    console.log('Cognigy 入力欄がアクティブになりました！！！');
     setTimeout(() => {
       // visualViewport APIが利用可能であれば使用（より正確）
       if (window.visualViewport) {
