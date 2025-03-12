@@ -131,7 +131,7 @@ function setupEventListeners() {
                     if (window.visualViewport) {
                         //chatbotContainer.style.height = `${window.visualViewport.height}px`;
                         //console.log(`高さを visualViewport の ${window.visualViewport.height}px に調整しました`);
-                        chatbotContainer.style.height = `200px`;
+                        window.innerHeight = `200px`;
                         console.log(`高さを200pxに調整しました`);
                     } else {
                         // フォールバックとしてinnerHeightを使用
