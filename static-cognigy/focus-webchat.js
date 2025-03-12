@@ -201,8 +201,5 @@ function createDebugPanel() {
     return debugPanel;
 }
 
-// ページ読み込み完了時にデバッグパネルを作成
-document.addEventListener('DOMContentLoaded', function () {
-    createDebugPanel();
-    console.log('デバッグパネルが初期化されました');
-});
+// デバッグパネルを作成
+createDebugPanel();
