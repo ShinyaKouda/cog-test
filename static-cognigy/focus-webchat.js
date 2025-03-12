@@ -86,56 +86,6 @@ webchat.registerAnalyticsService(event => {
 
 
 
-
-
-// MutationObserverを使用して動的に追加される要素を検知
-function watchForChatElements() {
-    const observer = new MutationObserver((mutations) => {
-        if (document.querySelector('[data-cognigy-webchat-root]')) {
-            observer.disconnect(); // 要素が見つかったら監視を停止
-            initChatHeightAdjustment(); // 初期化処理を実行
-        }
-    });
-
-    // DOM全体の変更を監視
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-}
-
-// DOMコンテンツロード時に初期化処理を開始
-document.addEventListener('DOMContentLoaded', () => {
-    // すでに要素が存在しているか確認
-    if (document.querySelector('[data-cognigy-webchat-root]')) {
-        initChatHeightAdjustment();
-    } else {
-        // 存在していない場合はMutationObserverで監視
-        watchForChatElements();
-    }
-});
-
-// すでにDOMコンテンツが読み込まれている場合の対応
-if (document.readyState === 'loading') {
-    // まだ読み込み中
-    document.addEventListener('DOMContentLoaded', () => {
-        if (document.querySelector('[data-cognigy-webchat-root]')) {
-            initChatHeightAdjustment();
-        } else {
-            watchForChatElements();
-        }
-    });
-} else {
-    // すでに読み込み完了
-    if (document.querySelector('[data-cognigy-webchat-root]')) {
-        initChatHeightAdjustment();
-    } else {
-        watchForChatElements();
-    }
-}
-
-
-
 // デバッグパネルを作成する関数
 function createDebugPanel() {
     // パネル要素の作成
