@@ -1,4 +1,11 @@
 webchat.registerAnalyticsService(event => {
+
+    // Cognigyウェブチャットの要素を取得
+    const chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
+    const chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+    console.log(chatbotContainer);
+    console.log(chatInput);
+    
     // メッセージを受信したときは、ユーザーのメッセージがある場合は最後のユーザーのメッセージが一番上に、
     // 無い場合は最初のボットのメッセージが一番上に来るようにする
     if (event.type === "webchat/incoming-message") {
@@ -27,9 +34,7 @@ webchat.registerAnalyticsService(event => {
 
 // Cognigyウェブチャットの初期化を待つ関数
 function initChatHeightAdjustment() {
-  // Cognigyウェブチャットの要素を取得
-  let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-  let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+  
   
   // 要素が見つからない場合は、再試行する
   if (!chatbotContainer || !chatInput) {
@@ -39,11 +44,6 @@ function initChatHeightAdjustment() {
   console.log('Cognigy要素が見つかりました。リスナーを設定します。');
   setTimeout(initChatHeightAdjustment, 500); // 500ミリ秒後に再試行
 
-  chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-  chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
-  console.log(chatbotContainer);
-  console.log(chatInput);
-  
   // 初期の高さを保存
   let originalHeight = window.innerHeight;
   chatbotContainer.style.height = `${originalHeight}px`;
