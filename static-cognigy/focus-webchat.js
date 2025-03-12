@@ -1,14 +1,9 @@
 webchat.registerAnalyticsService(event => {
 
-    
-    
     // メッセージを受信したときは、ユーザーのメッセージがある場合は最後のユーザーのメッセージが一番上に、
     // 無い場合は最初のボットのメッセージが一番上に来るようにする
     if (event.type === "webchat/incoming-message") {
         setTimeout(() => {
-            let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-            let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
-            // Cognigyウェブチャットの要素を取得
 
             var chatContainer = document.querySelector('.webchat-chat-history');
             var userMessages = document.querySelectorAll('.regular-message.user');
@@ -32,23 +27,17 @@ webchat.registerAnalyticsService(event => {
     }
 });
 
-// Cognigyウェブチャットの初期化を待つ関数
-function initChatHeightAdjustment() {
-  
-  // 要素が見つからない場合は、再試行する
-  if (!chatbotContainer || !chatInput) {
-    setTimeout(initChatHeightAdjustment, 500); // 500ミリ秒後に再試行
-    return;
-  }
-  console.log('Cognigy要素が見つかりました。リスナーを設定します。');
-  setTimeout(initChatHeightAdjustment, 500); // 500ミリ秒後に再試行
 
-  // 初期の高さを保存
-  let originalHeight = window.innerHeight;
-  chatbotContainer.style.height = `${originalHeight}px`;
+// 入力欄がアクティブになったとき
+chatInput.addEventListener('focus', () => {
 
-  // 入力欄がアクティブになったとき
-  chatInput.addEventListener('focus', () => {
+    let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
+    let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
+
+    // 初期の高さを保存
+    let originalHeight = window.innerHeight;
+    chatbotContainer.style.height = `${originalHeight}px`;
+            
     // 少し遅延させて、キーボードが表示された後の高さを取得
     console.log('Cognigy 入力欄がアクティブになりました！！！');
     setTimeout(() => {
@@ -63,37 +52,37 @@ function initChatHeightAdjustment() {
       }
     }, 300); // キーボード表示のアニメーションが完了するのを待つ
     console.log('Cognigy 入力欄がアクティブになり高さが調整されました');
-  });
+    });
 
-  // 入力欄が非アクティブになったとき
-  chatInput.addEventListener('blur', () => {
-    // 元の高さに戻す
-    setTimeout(() => {
-      chatbotContainer.style.height = `${originalHeight}px`;
-    }, 100); // 少し遅延させて、UIの更新タイミングを調整
-  });
+    // 入力欄が非アクティブになったとき
+    chatInput.addEventListener('blur', () => {
+        // 元の高さに戻す
+        setTimeout(() => {
+          chatbotContainer.style.height = `${originalHeight}px`;
+        }, 100); // 少し遅延させて、UIの更新タイミングを調整
+    });
 
-  // 画面サイズが変わったとき（向きの変更など）
-  window.addEventListener('resize', () => {
+    // 画面サイズが変わったとき（向きの変更など）
+    window.addEventListener('resize', () => {
     // アクティブ要素がチャット入力欄でない場合のみ基準値を更新
     if (document.activeElement !== chatInput) {
       originalHeight = window.innerHeight;
       chatbotContainer.style.height = `${originalHeight}px`;
     }
-  });
-
-  // visualViewport APIが使える場合は、より精密な調整が可能
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => {
-      // 入力欄がアクティブな場合のみ高さを調整
-      if (document.activeElement === chatInput) {
-        chatbotContainer.style.height = `${window.visualViewport.height}px`;
-      }
     });
-  }
-  
-  console.log('Cognigy チャットボット高さ調整スクリプトが初期化されました');
+
+    // visualViewport APIが使える場合は、より精密な調整が可能
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+          // 入力欄がアクティブな場合のみ高さを調整
+          if (document.activeElement === chatInput) {
+            chatbotContainer.style.height = `${window.visualViewport.height}px`;
+          }
+    });
 }
+  
+
+
 
 // MutationObserverを使用して動的に追加される要素を検知
 function watchForChatElements() {
