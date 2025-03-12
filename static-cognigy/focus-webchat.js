@@ -14,6 +14,7 @@ webchat.registerAnalyticsService(event => {
         setupEventListeners();
         // デバッグパネルを作成
         createDebugPanel();
+        console.log('Cognigyデバッグ用パネルを表示。');
     }
 
     // メッセージを受信したときの処理
