@@ -12,13 +12,13 @@ webchat.registerAnalyticsService(event => {
         
         // イベントリスナーの設定（1回だけ行う）
         setupEventListeners();
+        // デバッグパネルを作成
+        createDebugPanel();
     }
 
     // メッセージを受信したときの処理
     if (event.type === "webchat/incoming-message") {
         setTimeout(() => {
-            // デバッグパネルを作成
-            createDebugPanel();
 
             var chatContainer = document.querySelector('.webchat-chat-history');
             var userMessages = document.querySelectorAll('.regular-message.user');
