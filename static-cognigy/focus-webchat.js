@@ -9,8 +9,6 @@ webchat.registerAnalyticsService(event => {
             let chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
             let chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
             // Cognigyウェブチャットの要素を取得
-            console.log(chatbotContainer);
-            console.log(chatInput);
 
             var chatContainer = document.querySelector('.webchat-chat-history');
             var userMessages = document.querySelectorAll('.regular-message.user');
