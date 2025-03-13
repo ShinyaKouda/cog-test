@@ -82,6 +82,7 @@ function setupEventListeners(chatKeyboardAddressVisibleHeight, chatVisibleHeight
     
     document.addEventListener('focusout', function(e) {
         chatbotContainer.style.height = `${chatVisibleHeight}px`;
+        chatbotContainer.style.bottom = 0;
     });
 
 }
