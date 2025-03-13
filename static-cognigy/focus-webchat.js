@@ -12,11 +12,15 @@ webchat.registerAnalyticsService(event => {
         // デバッグパネルを作成
         createDebugPanel();
         
+        console.log("初期化を開始します");
+        
         // DOMContentLoaded に相当する処理をここで行う
         window.setTimeout(() => {
+            
+            console.log("DOM要素の取得を試みます");
             chatbotContainer = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat]');
             chatbotContainer.style.height = `${window.visualViewport.height}px`;
-            console.log(`初期化時のchatbotContainer.style.height: ${chatbotContainer.style.height}`
+            
             if (chatbotContainer) {
                 console.log("chatbotContainer を取得しました");
             } else {
@@ -39,11 +43,6 @@ webchat.registerAnalyticsService(event => {
             originalHeight = window.innerHeight;
             console.log(`初期の高さ: ${originalHeight}px`);
             
-            // ウィンドウサイズ変更イベント
-            //window.addEventListener('resize', throttle(function() {
-            //    console.log(`ウィンドウサイズ変更: ${window.innerWidth}x${window.innerHeight}`);
-            //}, 500));
-            
             // イベントリスナーの設定（1回だけ行う）
             setupEventListeners();
 
@@ -52,10 +51,10 @@ webchat.registerAnalyticsService(event => {
 
     // メッセージを受信したときの処理
     if (event.type === "webchat/incoming-message") {
+        console.log("受信メッセージを検知しました");
         setTimeout(() => {
 
-            chatbotContainer.style.height = `${window.visualViewport.height}px`;
-
+            console.log("メッセージ処理を開始します");
             var chatContainer = document.querySelector('.webchat-chat-history');
             if (!chatContainer) {
                 console.log("chatContainer が見つかりません");
@@ -93,6 +92,7 @@ webchat.registerAnalyticsService(event => {
 
 // イベントリスナーの設定を行う関数
 function setupEventListeners() {
+    console.log("イベントリスナーのセットアップを開始します");
     
     if (!chatInput) {
         console.log("chatInput が未取得のためイベントリスナーは設定できません");
@@ -101,13 +101,52 @@ function setupEventListeners() {
     
     // 以下の二つのイベントリスナーをdocumentレベルで設定
     document.addEventListener('focusin', function(e) {
-        chatbotContainer.style.height = `${window.visualViewport.height}px`;
-        console.log(`focusinのchatbotContainer.style.height: ${chatbotContainer.style.height}`
+        console.log(`フォーカスIN: ${e.target.tagName} 要素がフォーカスされました`);
+        
+        // チャット入力欄にフォーカスが当たった場合の処理
+        if (e.target === chatInput || chatInput.contains(e.target)) {
+            console.log("chatInput にフォーカスしました (focusin経由)");
+            // 初期の高さを保存
+            originalHeight = window.innerHeight;
+            if (chatbotContainer) {
+                chatbotContainer.style.height = `${originalHeight}px`;
+                console.log(`高さを ${originalHeight}px に設定しました`);
+            
+                // 少し遅延させて、キーボードが表示された後の高さを取得
+                setTimeout(() => {
+                    // visualViewport APIが利用可能であれば使用（より正確）
+                    if (window.visualViewport) {
+                        chatbotContainer.style.height = `${window.visualViewport.height}px`;
+                        console.log(`高さを visualViewport の ${window.visualViewport.height}px に調整しました`);
+                        console.log(`chatbotContainer.style.height の値は ${chatbotContainer.style.height}px です`);
+                        console.log(`window.innerHeight の値は ${window.innerHeight}px です`);
+                    } else {
+                        // フォールバックとしてinnerHeightを使用
+                        chatbotContainer.style.height = `${window.innerHeight}px`;
+                        console.log(`高さを innerHeight の ${window.innerHeight}px に調整しました`);
+                    }
+                }, 300); // キーボード表示のアニメーションが完了するのを待つ
+            } else {
+                console.log("chatbotContainer が未取得のため高さ調整はスキップします");
+            }
+        }
     });
     
     document.addEventListener('focusout', function(e) {
-        chatbotContainer.style.height = `${window.innerHeight}px`;
-        console.log(`focusoutのchatbotContainer.style.height: ${chatbotContainer.style.height}`
+        console.log(`フォーカスOUT: ${e.target.tagName} 要素からフォーカスが外れました`);
+        
+        // チャット入力欄からフォーカスが外れた場合の処理
+        if (e.target === chatInput || chatInput.contains(e.target)) {
+            console.log("chatInput からフォーカスが外れました (focusout経由)");
+            setTimeout(() => {
+                if (chatbotContainer) {
+                    chatbotContainer.style.height = `${originalHeight}px`;
+                    console.log(`高さを ${originalHeight}px に戻しました`);
+                } else {
+                    console.log("chatbotContainer が未取得のため高さ調整はスキップします");
+                }
+            }, 100);
+        }
     });
 }
 
