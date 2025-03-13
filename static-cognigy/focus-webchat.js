@@ -17,7 +17,7 @@ webchat.registerAnalyticsService(event => {
 
             // 見えるところだけに絞る？→OK
             keyboard = window.visualViewport.height
-            chatbotContainer.style.height = `${keyboard}px`;
+            //chatbotContainer.style.height = `${keyboard}px`;
             
             
             // イベントリスナーの設定（1回だけ行う）
