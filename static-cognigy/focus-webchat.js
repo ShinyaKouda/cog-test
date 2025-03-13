@@ -81,13 +81,13 @@ function setupEventListeners(all, keyboard) {
     document.addEventListener('focusin', function(e) {
         setTimeout(() => {
             chatbotContainer.style.height = `${keyboard}px`;
-        }, 100);
+        }, 300);
     });
     
     document.addEventListener('focusout', function(e) {
         setTimeout(() => {
             chatbotContainer.style.height = `600px`;
-        }, 100);
+        }, 300);
     });
 
 }
