@@ -130,8 +130,9 @@ function setupEventListeners() {
                     // visualViewport APIが利用可能であれば使用（より正確）
                     if (window.visualViewport) {
                         chatbotContainer.style.height = `${window.visualViewport.height}px`;
-                        window.innerHeight = `${window.visualViewport.height}px`;
                         console.log(`高さを visualViewport の ${window.visualViewport.height}px に調整しました`);
+                        console.log(`chatbotContainer.style.height の値は ${chatbotContainer.style.height}px です`);
+                        console.log(`window.innerHeight の値は ${window.innerHeight}px です`);
                     } else {
                         // フォールバックとしてinnerHeightを使用
                         chatbotContainer.style.height = `${window.innerHeight}px`;
