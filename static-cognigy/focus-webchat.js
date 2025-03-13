@@ -17,7 +17,7 @@ webchat.registerAnalyticsService(event => {
             // イベントリスナーの設定（1回だけ行う）
             setupEventListeners();
 
-        }, 1000); // 1秒待ってから実行
+        }, 500); // 0.5秒待ってから実行
     }
 
     // メッセージを受信したときの処理
@@ -25,35 +25,24 @@ webchat.registerAnalyticsService(event => {
         setTimeout(() => {
 
             var chatContainer = document.querySelector('.webchat-chat-history');
-            if (!chatContainer) {
-                console.log("chatContainer が見つかりません");
-                return;
-            }
-            
             var userMessages = document.querySelectorAll('.regular-message.user');
             var targetElement;
 
             if (userMessages.length > 0) {
-                console.log(`ユーザーメッセージを ${userMessages.length} 件見つけました`);
                 // ユーザーメッセージがある場合は最後のユーザーメッセージを取得
                 targetElement = userMessages[userMessages.length - 1];
             } else {
-                console.log("ユーザーメッセージが見つからないため、ボットメッセージを探します");
                 // ユーザーメッセージがない場合は最初のボットのメッセージを取得
                 var botMessages = document.querySelectorAll('.regular-message.bot');
                 if (botMessages.length > 0) {
-                    console.log(`ボットメッセージを ${botMessages.length} 件見つけました`);
                     targetElement = botMessages[0];
                 }
             }
 
             if (targetElement) {
-                console.log("スクロール位置を調整します");
                 // 要素の上端の位置を取得してスクロールする
                 var topPosition = targetElement.offsetTop - targetElement.offsetHeight;
                 chatContainer.scrollTop = topPosition;
-            } else {
-                console.log("スクロール対象の要素が見つかりません");
             }
         }, 100);
     }
@@ -66,13 +55,13 @@ function setupEventListeners() {
     document.addEventListener('focusin', function(e) {
         setTimeout(() => {
             chatbotContainer.style.height = `${window.visualViewport.height}px`;
-        }, 1000);
+        }, 500);
     });
     
     document.addEventListener('focusout', function(e) {
         setTimeout(() => {
             chatbotContainer.style.height = `500px`;
-        }, 1000);
+        }, 500);
     });
 
 }
