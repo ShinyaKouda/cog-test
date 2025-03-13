@@ -17,7 +17,7 @@ webchat.registerAnalyticsService(event => {
         // DOMContentLoaded に相当する処理をここで行う
         window.setTimeout(() => {
             console.log("DOM要素の取得を試みます");
-            chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
+            chatbotContainer = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat]');
             
             if (chatbotContainer) {
                 console.log("chatbotContainer を取得しました");
