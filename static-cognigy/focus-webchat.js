@@ -66,13 +66,13 @@ function setupEventListeners() {
     document.addEventListener('focusin', function(e) {
         setTimeout(() => {
             chatbotContainer.style.height = `${window.visualViewport.height}px`;
-        }, 100);
+        }, 1000);
     });
     
     document.addEventListener('focusout', function(e) {
         setTimeout(() => {
             chatbotContainer.style.height = `500px`;
-        }, 100);
+        }, 1000);
     });
 
 }
