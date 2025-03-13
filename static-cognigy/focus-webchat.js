@@ -7,8 +7,6 @@ let all;
 all = window.innerHeight;
 
 webchat.registerAnalyticsService(event => {
-
-    
     
     // 初期化処理（最初の1回だけ実行するもの）
     if (!chatbotContainer) {
@@ -16,9 +14,7 @@ webchat.registerAnalyticsService(event => {
         // DOMContentLoaded に相当する処理をここで行う
         window.setTimeout(() => {
             chatbotContainer = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat]');
-            
-            chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
-            
+
             // 見えるところだけに絞る？→OK
             keyboard = window.visualViewport.height
             chatbotContainer.style.height = `${keyboard}px`;
@@ -72,21 +68,16 @@ webchat.registerAnalyticsService(event => {
 // イベントリスナーの設定を行う関数
 function setupEventListeners(all, keyboard) {
     
-    if (!chatInput) {
-        console.log("chatInput が未取得のためイベントリスナーは設定できません");
-        return;
-    }
-    
     // 以下の二つのイベントリスナーをdocumentレベルで設定
     document.addEventListener('focusin', function(e) {
         setTimeout(() => {
-            chatbotContainer.style.height = `${keyboard}px`;
+            document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat]').style.height = `${keyboard}px`;
         }, 1000);
     });
     
     document.addEventListener('focusout', function(e) {
         setTimeout(() => {
-            chatbotContainer.style.height = `${all}px`;
+            document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat]').style.height = `${all}px`;
         }, 1000);
     });
 
