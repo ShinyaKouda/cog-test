@@ -101,11 +101,11 @@ function setupEventListeners() {
     
     // 以下の二つのイベントリスナーをdocumentレベルで設定
     document.addEventListener('focusin', function(e) {
-        chatbotContainer.style.height = `${window.visualViewport.height}px`;
+        chatbotContainer.style.height = `${window.innerHeight}px`;
     });
     
     document.addEventListener('focusout', function(e) {
-        chatbotContainer.style.height = `${window.innerHeight}px`;
+        chatbotContainer.style.height = `${window.visualViewport.height}px`;
     });
 }
 
