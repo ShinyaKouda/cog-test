@@ -79,7 +79,9 @@ function setupEventListeners(all, keyboard) {
     
     // 以下の二つのイベントリスナーをdocumentレベルで設定
     document.addEventListener('focusin', function(e) {
-        chatbotContainer.style.height = `${keyboard}px`;
+        setTimeout(() => {
+            chatbotContainer.style.height = `${keyboard}px`;
+        }, 100);
     });
     
     document.addEventListener('focusout', function(e) {
