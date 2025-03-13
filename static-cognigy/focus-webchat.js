@@ -83,7 +83,9 @@ function setupEventListeners(all, keyboard) {
     });
     
     document.addEventListener('focusout', function(e) {
-        chatbotContainer.style.height = `${all}px`;
+        setTimeout(() => {
+            chatbotContainer.style.height = `${all}px`;
+        }, 100);
     });
 
 }
