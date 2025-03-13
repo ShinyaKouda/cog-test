@@ -15,7 +15,11 @@ webchat.registerAnalyticsService(event => {
             
             chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
             
+            // 全画面状態？をキープ
             originalHeight = window.innerHeight;
+            
+            // 見えるところだけに絞る？
+            chatbotContainer.style.height = `${window.visualViewport.height}px`;
             
             // イベントリスナーの設定（1回だけ行う）
             setupEventListeners();
@@ -72,8 +76,9 @@ function setupEventListeners() {
     
     // 以下の二つのイベントリスナーをdocumentレベルで設定
     document.addEventListener('focusin', function(e) {
-        originalHeight = window.innerHeight;
         chatbotContainer.style.height = `${window.visualViewport.height}px`;
+        // 次回以降のためにキープ？
+        originalHeight = window.innerHeight;
     });
     
     document.addEventListener('focusout', function(e) {
