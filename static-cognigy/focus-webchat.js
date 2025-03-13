@@ -1,7 +1,6 @@
 // グローバル変数の宣言
 let chatbotContainer;
 let chatInput;
-let originalHeight;
 
 webchat.registerAnalyticsService(event => {
     
@@ -15,10 +14,7 @@ webchat.registerAnalyticsService(event => {
             
             chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
             
-            // 全画面状態？をキープ
-            originalHeight = window.innerHeight;
-            
-            // 見えるところだけに絞る？
+            // 見えるところだけに絞る？→OK
             chatbotContainer.style.height = `${window.visualViewport.height}px`;
             
             // イベントリスナーの設定（1回だけ行う）
@@ -77,12 +73,10 @@ function setupEventListeners() {
     // 以下の二つのイベントリスナーをdocumentレベルで設定
     document.addEventListener('focusin', function(e) {
         chatbotContainer.style.height = `${window.visualViewport.height}px`;
-        // 次回以降のためにキープ？
-        originalHeight = window.innerHeight;
     });
     
     document.addEventListener('focusout', function(e) {
-        chatbotContainer.style.height = `${originalHeight}px`;
+        chatbotContainer.style.height = `${window.innerHeight}px`;
     });
 
 }
