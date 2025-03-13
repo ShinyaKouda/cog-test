@@ -10,16 +10,11 @@ webchat.registerAnalyticsService(event => {
     // 初期化処理（最初の1回だけ実行するもの）
     if (!chatbotContainer) {
         // デバッグパネルを作成
-        createDebugPanel();
-        
-        console.log("初期化を開始します");
+        //createDebugPanel();
         
         // DOMContentLoaded に相当する処理をここで行う
         window.setTimeout(() => {
-            
-            console.log("DOM要素の取得を試みます");
             chatbotContainer = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat]');
-            chatbotContainer.style.height = `${window.visualViewport.height}px`;
             
             if (chatbotContainer) {
                 console.log("chatbotContainer を取得しました");
@@ -43,6 +38,11 @@ webchat.registerAnalyticsService(event => {
             originalHeight = window.innerHeight;
             console.log(`初期の高さ: ${originalHeight}px`);
             
+            // ウィンドウサイズ変更イベント
+            //window.addEventListener('resize', throttle(function() {
+            //    console.log(`ウィンドウサイズ変更: ${window.innerWidth}x${window.innerHeight}`);
+            //}, 500));
+            
             // イベントリスナーの設定（1回だけ行う）
             setupEventListeners();
 
@@ -51,10 +51,8 @@ webchat.registerAnalyticsService(event => {
 
     // メッセージを受信したときの処理
     if (event.type === "webchat/incoming-message") {
-        console.log("受信メッセージを検知しました");
         setTimeout(() => {
 
-            console.log("メッセージ処理を開始します");
             var chatContainer = document.querySelector('.webchat-chat-history');
             if (!chatContainer) {
                 console.log("chatContainer が見つかりません");
@@ -92,7 +90,6 @@ webchat.registerAnalyticsService(event => {
 
 // イベントリスナーの設定を行う関数
 function setupEventListeners() {
-    console.log("イベントリスナーのセットアップを開始します");
     
     if (!chatInput) {
         console.log("chatInput が未取得のためイベントリスナーは設定できません");
@@ -148,6 +145,22 @@ function setupEventListeners() {
             }, 100);
         }
     });
+
+    // 互換性のため元のイベントも残しておく（万が一動作するようになったとき用）
+    chatInput.addEventListener('focus', function() {
+        console.log("chatInput にフォーカスしました (focus経由)");
+    });
+
+    chatInput.addEventListener('blur', function() {
+        console.log("chatInput からフォーカスが外れました (blur経由)");
+    });
+    
+    // 入力イベントもテスト
+    chatInput.addEventListener('input', throttle(function() {
+        console.log("入力イベントを検知しました");
+    }, 500));
+
+    console.log("イベントリスナーのセットアップが完了しました");
 }
 
 // デバッグパネルを作成する関数
