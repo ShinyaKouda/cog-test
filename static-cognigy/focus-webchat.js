@@ -9,6 +9,7 @@ webchat.registerAnalyticsService(event => {
     // 初期化処理（最初の1回だけ実行するもの）
     if (!chatbotContainer) {
 
+        chatVisibleHeight = window.innerHeight;
         
         // DOMContentLoaded に相当する処理をここで行う
         window.setTimeout(() => {
@@ -19,7 +20,7 @@ webchat.registerAnalyticsService(event => {
             // 見えるところだけに絞る？→OK
             chatKeyboardAddressVisibleHeight = window.visualViewport.height
             chatbotContainer.style.height = `${chatKeyboardAddressVisibleHeight}px`;
-            chatVisibleHeight = window.innerHeight
+            
             
             // イベントリスナーの設定（1回だけ行う）
             setupEventListeners(chatKeyboardAddressVisibleHeight, chatVisibleHeight);
