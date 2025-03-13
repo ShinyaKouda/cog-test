@@ -86,7 +86,7 @@ function setupEventListeners(all, keyboard) {
     
     document.addEventListener('focusout', function(e) {
         setTimeout(() => {
-            chatbotContainer.style.height = `100vh`;
+            chatbotContainer.style.height = `600px`;
         }, 100);
     });
 
