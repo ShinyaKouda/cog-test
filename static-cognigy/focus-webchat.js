@@ -10,13 +10,13 @@ webchat.registerAnalyticsService(event => {
     // 初期化処理（最初の1回だけ実行するもの）
     if (!chatbotContainer) {
         // デバッグパネルを作成
-        //createDebugPanel();
+        createDebugPanel();
         
         // DOMContentLoaded に相当する処理をここで行う
         window.setTimeout(() => {
             chatbotContainer = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat]');
             chatbotContainer.style.height = `${window.visualViewport.height}px`;
-            
+            console.log(`初期化時のchatbotContainer.style.height: ${chatbotContainer.style.height}`
             if (chatbotContainer) {
                 console.log("chatbotContainer を取得しました");
             } else {
@@ -101,11 +101,13 @@ function setupEventListeners() {
     
     // 以下の二つのイベントリスナーをdocumentレベルで設定
     document.addEventListener('focusin', function(e) {
-        chatbotContainer.style.height = `${window.innerHeight}px`;
+        chatbotContainer.style.height = `${window.visualViewport.height}px`;
+        console.log(`focusinのchatbotContainer.style.height: ${chatbotContainer.style.height}`
     });
     
     document.addEventListener('focusout', function(e) {
-        chatbotContainer.style.height = `${window.visualViewport.height}px`;
+        chatbotContainer.style.height = `${window.innerHeight}px`;
+        console.log(`focusoutのchatbotContainer.style.height: ${chatbotContainer.style.height}`
     });
 }
 
