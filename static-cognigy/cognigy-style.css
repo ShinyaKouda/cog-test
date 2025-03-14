@@ -6,7 +6,7 @@
 /* Webchatの表示サイズ */
 [data-cognigy-webchat-root] [data-cognigy-webchat] {
     width: 500px;
-    height: 92vh;
+    height: 92vh !important;
     bottom: 30px;
     right: 30px;
     border-radius: 0;
