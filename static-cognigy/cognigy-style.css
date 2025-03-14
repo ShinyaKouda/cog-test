@@ -18,6 +18,8 @@
   /* ルート要素のスタイル */
   [data-cognigy-webchat-root]  [data-cognigy-webchat] {
     width: 100%;
+    top: auto !important;
+    bottom: 0 !important;
     font-size: 16px;
   }
 }
