@@ -75,7 +75,7 @@ function setupEventListeners() {
     
     function adjustHeightOnFocusOut(e) {
         setTimeout(() => {
-            chatbotContainer.style.height = `500px`;
+            chatbotContainer.style.height = `100vh`;
         }, 500);
     }
     
