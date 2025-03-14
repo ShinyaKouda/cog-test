@@ -14,13 +14,27 @@
 }
 
 /* レスポンシブ対応：Webchatの表示サイズ（改良版） */
+/* Chrome/Safari用 (Webkit系) */
 @media only screen and (max-width: 768px) {
-  /* ルート要素のスタイル */
-  [data-cognigy-webchat-root]  [data-cognigy-webchat] {
-    width: 100%;
-    top: auto !important;
-    bottom: auto !important;
-    font-size: 16px;
+  @supports (-webkit-appearance: none) {
+    [data-cognigy-webchat-root] [data-cognigy-webchat] {
+      width: 100%;
+      top: auto !important;
+      bottom: 0 !important;
+      font-size: 16px;
+    }
+  }
+}
+
+/* Firefox用 (Gecko系) */
+@media only screen and (max-width: 768px) {
+  @-moz-document url-prefix() {
+    [data-cognigy-webchat-root] [data-cognigy-webchat] {
+      width: 100%;
+      top: 0 !important;
+      bottom: auto !important;
+      font-size: 16px;
+    }
   }
 }
 
