@@ -61,6 +61,16 @@
     text-align: unset;
 }
 
+/* 吹き出し口左上へ */
+[data-cognigy-webchat-root] .cognigy-webchat-5uj5vj {
+    border-radius: 0px 16px 16px 16px;
+    padding:12px 20px;
+}
+
+[data-cognigy-webchat-root] .cognigy-webchat-duls6z {
+    border-radius: 0px 16px 16px 16px;
+}
+
 /* メッセージ枠線設定 */
 [data-cognigy-webchat-root] .regular-message,
 [data-cognigy-webchat-root] .regular-message.bot,
@@ -98,6 +108,20 @@
 [data-cognigy-webchat-root] .webchat-carousel-template-button {
     background-color: rgb(255,255,255);
 }
+
+/*リンクの下線が表示される対策*/
+/*メッセージ内のリンクに下線強制*/
+[data-cognigy-webchat-root] a{text-decoration: underline !important;
+}
+
+/*メッセージ内のリンクの下線カラー変更（現在「青」設定中）*/
+[data-cognigy-webchat-root] a{text-decoration-color: blue !important;
+}
+
+/*メッセージ内のリンクのホバー時、カラー変更（現在「青」設定中）*/
+[data-cognigy-webchat-root] a:hover{color:blue !important;
+}
+
 
 /* ギャラリー左右ボタン常時表示設定 */
 [data-cognigy-webchat-root] .carousel .control-prev.control-arrow:before {
@@ -164,8 +188,14 @@
        以下のavatar.pngへのパスを、このcssファイルからの相対パスまたは、絶対パスに書き換えてください。
     */
     background-image: url(avatar.png);
-    flex-basis: 30px;
-    height: 28px;
+    flex-basis: 35px; /* 変更 */
+    height: 30px; /* 変更 */
+}
+
+/* 追記 */
+[data-cognigy-webchat-root] .cognigy-webchat-47vdrg{
+    border: none;
+    background-size: 34px;
 }
 
 /* アバターの上辺を親要素の上辺に揃える */
@@ -186,13 +216,26 @@
        以下のchat-start.pngへのパスを、このcssファイルからの相対パスまたは、絶対パスに書き換えてください。
     */
     background-image: url(chat-start.png);
-    width: 192px;
-    height: 96px;
-    bottom: 120px !important;
-    border-radius: 0%;
+    background-color: transparent; /* 明示的に透明にする */
+    width: 100px; /* サイズ変更 */
+    height: 100px; /* サイズ変更 */
+    bottom: 80px !important; /* 上下位置変更 */
+    border-radius: 15%; /* 角丸目変更 */
     background-size: cover;
     background-position: center;
 }
+
+/* 開始アイコンに影設定削除 */
+[data-cognigy-webchat-root] button[class*=" webchat-"], [data-cognigy-webchat-root] button[class^="webchat-"],
+[data-cognigy-webchat-root] button[data-cognigy-webchat-toggle]:focus {
+    box-shadow:none;
+}
+
+/* 追記 */
+[data-cognigy-webchat-root] button[data-cognigy-webchat-toggle] {
+    right: 40px; /* 右幅サイズ */
+}
+
 
 /* レスポンシブ対応：チャット開始ボタン */
 @media only screen and (max-width: 768px) {
@@ -203,10 +246,11 @@
         以下のchat-start.pngへのパスを、このcssファイルからの相対パスまたは、絶対パスに書き換えてください。
         */
         background-image: url(chat-start.png);
-        width: 128px;
-        height: 64px;
+        background-color: transparent; /* 明示的に透明にする */
+        width: 90px; /* サイズ変更 */
+        height: 90px; /* サイズ変更 */
         bottom: 80px !important;
-        border-radius: 0%;
+        border-radius: 15%; /* 角丸目変更 */
         background-size: cover;
         background-position: center;
     }
