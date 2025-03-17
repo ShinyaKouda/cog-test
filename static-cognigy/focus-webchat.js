@@ -17,7 +17,7 @@ webchat.registerAnalyticsService(event => {
             // イベントリスナーの設定（1回だけ行う）
             setupEventListeners();
 
-        }, 500); // 0.5秒待ってから実行
+        }, 1000); // 1秒待ってから実行
     }
 
     // メッセージを受信したときの処理
@@ -70,13 +70,13 @@ function setupEventListeners() {
     function adjustHeightOnFocusIn(e) {
         setTimeout(() => {
             chatbotContainer.style.height = `${window.visualViewport.height}px`;
-        }, 500);
+        }, 1000);
     }
     
     function adjustHeightOnFocusOut(e) {
         setTimeout(() => {
             chatbotContainer.style.height = `${window.visualViewport.height}px`;//`100vh`;
-        }, 500);
+        }, 1000);
     }
     
     // 初期状態でチェック
