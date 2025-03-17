@@ -1,60 +1,18 @@
 // グローバル変数の宣言
 let chatbotContainer;
 let chatInput;
-let originalHeight;
 
 webchat.registerAnalyticsService(event => {
     
-    console.log(`Analytics event detected: ${event.type}`);
-    
     // 初期化処理（最初の1回だけ実行するもの）
     if (!chatbotContainer) {
-        // デバッグパネルを作成
-        createDebugPanel();
-        
-        console.log("初期化を開始します");
         
         // DOMContentLoaded に相当する処理をここで行う
         window.setTimeout(() => {
-            console.log("DOM要素の取得を試みます");
-            chatbotContainer = document.querySelector('[data-cognigy-webchat-root]');
-            
-            if (chatbotContainer) {
-                console.log("chatbotContainer を取得しました");
-            } else {
-                console.log("chatbotContainer の取得に失敗しました");
-            }
-            
-            chatInput = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat].webchat .webchat-input');
-            
-            if (chatInput) {
-                console.log("chatInput を取得しました");
-            } else {
-                console.log("chatInput の取得に失敗しました");
-                // もっと一般的なセレクタを試してみる
-                chatInput = document.querySelector('input') || document.querySelector('textarea');
-                if (chatInput) {
-                    console.log("代替の入力要素を取得しました");
-                }
-            }
-            
-            originalHeight = window.innerHeight;
-            console.log(`初期の高さ: ${originalHeight}px`);
-            
-            // 基本的なクリックイベントを追加してみる
-            document.addEventListener('click', function(e) {
-                console.log(`クリックイベントを検知: x=${e.clientX}, y=${e.clientY}`);
-            });
-            
-            // ボディ要素にイベントを追加
-            document.body.addEventListener('mousemove', throttle(function(e) {
-                console.log(`マウス移動: x=${e.clientX}, y=${e.clientY}`);
-            }, 1000)); // 1秒ごとに制限
-            
-            // ウィンドウサイズ変更イベント
-            window.addEventListener('resize', throttle(function() {
-                console.log(`ウィンドウサイズ変更: ${window.innerWidth}x${window.innerHeight}`);
-            }, 500));
+            chatbotContainer = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat]');
+
+            // 見えるところだけに絞る
+            chatbotContainer.style.height = `100px`
             
             // イベントリスナーの設定（1回だけ行う）
             setupEventListeners();
@@ -64,40 +22,27 @@ webchat.registerAnalyticsService(event => {
 
     // メッセージを受信したときの処理
     if (event.type === "webchat/incoming-message") {
-        console.log("受信メッセージを検知しました");
         setTimeout(() => {
 
-            console.log("メッセージ処理を開始します");
             var chatContainer = document.querySelector('.webchat-chat-history');
-            if (!chatContainer) {
-                console.log("chatContainer が見つかりません");
-                return;
-            }
-            
             var userMessages = document.querySelectorAll('.regular-message.user');
             var targetElement;
 
             if (userMessages.length > 0) {
-                console.log(`ユーザーメッセージを ${userMessages.length} 件見つけました`);
                 // ユーザーメッセージがある場合は最後のユーザーメッセージを取得
                 targetElement = userMessages[userMessages.length - 1];
             } else {
-                console.log("ユーザーメッセージが見つからないため、ボットメッセージを探します");
                 // ユーザーメッセージがない場合は最初のボットのメッセージを取得
                 var botMessages = document.querySelectorAll('.regular-message.bot');
                 if (botMessages.length > 0) {
-                    console.log(`ボットメッセージを ${botMessages.length} 件見つけました`);
                     targetElement = botMessages[0];
                 }
             }
 
             if (targetElement) {
-                console.log("スクロール位置を調整します");
                 // 要素の上端の位置を取得してスクロールする
                 var topPosition = targetElement.offsetTop - targetElement.offsetHeight;
                 chatContainer.scrollTop = topPosition;
-            } else {
-                console.log("スクロール対象の要素が見つかりません");
             }
         }, 100);
     }
@@ -105,78 +50,40 @@ webchat.registerAnalyticsService(event => {
 
 // イベントリスナーの設定を行う関数
 function setupEventListeners() {
-    console.log("イベントリスナーのセットアップを開始します");
+    // モバイル向けのメディアクエリ
+    const mobileMediaQuery = window.matchMedia('(max-width: 768px)');
     
-    if (!chatInput) {
-        console.log("chatInput が未取得のためイベントリスナーは設定できません");
-        return;
+    // メディアクエリのリスナー関数
+    function handleMobileChange(e) {
+        if (e.matches) {
+            // モバイルサイズの場合、イベントリスナーを追加
+            document.addEventListener('focusin', adjustHeightOnFocusIn);
+            document.addEventListener('focusout', adjustHeightOnFocusOut);
+        } else {
+            // モバイルサイズではない場合、イベントリスナーを削除
+            document.removeEventListener('focusin', adjustHeightOnFocusIn);
+            document.removeEventListener('focusout', adjustHeightOnFocusOut);
+        }
     }
     
-    // 以下の二つのイベントリスナーをdocumentレベルで設定
-    document.addEventListener('focusin', function(e) {
-        console.log(`フォーカスIN: ${e.target.tagName} 要素がフォーカスされました`);
-        
-        // チャット入力欄にフォーカスが当たった場合の処理
-        if (e.target === chatInput || chatInput.contains(e.target)) {
-            console.log("chatInput にフォーカスしました (focusin経由)");
-            // 初期の高さを保存
-            originalHeight = window.innerHeight;
-            if (chatbotContainer) {
-                chatbotContainer.style.height = `${originalHeight}px`;
-                console.log(`高さを ${originalHeight}px に設定しました`);
-            
-                // 少し遅延させて、キーボードが表示された後の高さを取得
-                setTimeout(() => {
-                    // visualViewport APIが利用可能であれば使用（より正確）
-                    if (window.visualViewport) {
-                        chatbotContainer.style.height = `${window.visualViewport.height}px`;
-                        console.log(`高さを visualViewport の ${window.visualViewport.height}px に調整しました`);
-                        console.log(`chatbotContainer.style.height の値は ${chatbotContainer.style.height}px です`);
-                        console.log(`window.innerHeight の値は ${window.innerHeight}px です`);
-                    } else {
-                        // フォールバックとしてinnerHeightを使用
-                        chatbotContainer.style.height = `${window.innerHeight}px`;
-                        console.log(`高さを innerHeight の ${window.innerHeight}px に調整しました`);
-                    }
-                }, 300); // キーボード表示のアニメーションが完了するのを待つ
-            } else {
-                console.log("chatbotContainer が未取得のため高さ調整はスキップします");
-            }
-        }
-    });
+    // 関数を分離して、追加/削除を容易にする
+    function adjustHeightOnFocusIn(e) {
+        setTimeout(() => {
+            chatbotContainer.style.height = `${window.visualViewport.height}px`;
+        }, 1000);
+    }
     
-    document.addEventListener('focusout', function(e) {
-        console.log(`フォーカスOUT: ${e.target.tagName} 要素からフォーカスが外れました`);
-        
-        // チャット入力欄からフォーカスが外れた場合の処理
-        if (e.target === chatInput || chatInput.contains(e.target)) {
-            console.log("chatInput からフォーカスが外れました (focusout経由)");
-            setTimeout(() => {
-                if (chatbotContainer) {
-                    chatbotContainer.style.height = `${originalHeight}px`;
-                    console.log(`高さを ${originalHeight}px に戻しました`);
-                } else {
-                    console.log("chatbotContainer が未取得のため高さ調整はスキップします");
-                }
-            }, 100);
-        }
-    });
-
-    // 互換性のため元のイベントも残しておく（万が一動作するようになったとき用）
-    chatInput.addEventListener('focus', function() {
-        console.log("chatInput にフォーカスしました (focus経由)");
-    });
-
-    chatInput.addEventListener('blur', function() {
-        console.log("chatInput からフォーカスが外れました (blur経由)");
-    });
+    function adjustHeightOnFocusOut(e) {
+        setTimeout(() => {
+            chatbotContainer.style.height = `${window.visualViewport.height}px`;//`100vh`;
+        }, 1000);
+    }
     
-    // 入力イベントもテスト
-    chatInput.addEventListener('input', throttle(function() {
-        console.log("入力イベントを検知しました");
-    }, 500));
-
-    console.log("イベントリスナーのセットアップが完了しました");
+    // 初期状態でチェック
+    handleMobileChange(mobileMediaQuery);
+    
+    // 画面サイズ変更時にもチェック
+    mobileMediaQuery.addEventListener('change', handleMobileChange);
 }
 
 // デバッグパネルを作成する関数
