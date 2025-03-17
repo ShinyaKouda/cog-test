@@ -14,8 +14,10 @@ webchat.registerAnalyticsService(event => {
             chatbotContainer = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat]');
 
             // 見えるところだけに絞る
+            console.log('初期高さ：ビューポートの高さは'+`${window.visualViewport.height}px`+'です')
+            console.log('初期高さ：chatbotContainerの高さは'+`${chatbotContainer.style.height}`+'です')
             chatbotContainer.style.height = `100px`
-            console.log('初期高さ：100pxに変更')
+            console.log('初期高さ：chatbotContainerの高さを'+`${chatbotContainer.style.height}`+'に変更しました')
             
             // イベントリスナーの設定（1回だけ行う）
             setupEventListeners();
@@ -73,15 +75,17 @@ function setupEventListeners() {
     // 関数を分離して、追加/削除を容易にする
     function adjustHeightOnFocusIn(e) {
         setTimeout(() => {
+            console.log('フォーカスイン：チャットの高さを'+`${window.visualViewport.height}px`+'に変更します')
             chatbotContainer.style.height = `${window.visualViewport.height}px`;
-            console.log('フォーカスイン：チャットの高さを${chatbotContainer.style.height}に変更')
+            console.log('フォーカスイン：チャットの高さを'+`${chatbotContainer.style.height}`+'に変更しました')
         }, 1000);
     }
     
     function adjustHeightOnFocusOut(e) {
         setTimeout(() => {
+            console.log('フォーカスアウト：チャットの高さを'+`${window.visualViewport.height}px`+'に変更します')
             chatbotContainer.style.height = `${window.visualViewport.height}px`;//`100vh`;
-            console.log('フォーカスアウト：チャットの高さを${chatbotContainer.style.height}に変更')
+            console.log('フォーカスアウト：チャットの高さを'+`${chatbotContainer.style.height}`+'に変更しました')
         }, 1000);
     }
     
@@ -104,7 +108,7 @@ function createDebugPanel() {
     controlPanel.id = 'debug-control-panel';
     controlPanel.style.cssText = `
     position: fixed;
-    bottom: 265px;
+    bottom: 315px;
     left: 0;
     width: 100%;
     padding: 5px;
@@ -174,7 +178,7 @@ function createDebugPanel() {
     // スタイルの設定 - コントロールパネルの上に配置
     debugPanel.style.cssText = `
     position: fixed;
-    bottom: 300px;
+    bottom: 350px;
     left: 0;
     width: 100%;
     max-height: 40vh;
