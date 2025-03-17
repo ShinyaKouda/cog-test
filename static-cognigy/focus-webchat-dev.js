@@ -104,7 +104,7 @@ function createDebugPanel() {
     controlPanel.id = 'debug-control-panel';
     controlPanel.style.cssText = `
     position: fixed;
-    bottom: 60px; /* チャット入力欄の上にくるように位置調整 */
+    bottom: 265px;
     left: 0;
     width: 100%;
     padding: 5px;
@@ -174,7 +174,7 @@ function createDebugPanel() {
     // スタイルの設定 - コントロールパネルの上に配置
     debugPanel.style.cssText = `
     position: fixed;
-    bottom: 400px;
+    bottom: 300px;
     left: 0;
     width: 100%;
     max-height: 40vh;
