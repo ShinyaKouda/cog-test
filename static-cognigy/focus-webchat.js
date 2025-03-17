@@ -12,7 +12,7 @@ webchat.registerAnalyticsService(event => {
             chatbotContainer = document.querySelector('[data-cognigy-webchat-root] [data-cognigy-webchat]');
 
             // 見えるところだけに絞る
-            chatbotContainer.style.height = `${window.visualViewport.height}px`
+            chatbotContainer.style.height = `100px`
             
             // イベントリスナーの設定（1回だけ行う）
             setupEventListeners();
