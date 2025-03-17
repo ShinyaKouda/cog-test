@@ -6,6 +6,8 @@ webchat.registerAnalyticsService(event => {
     
     // 初期化処理（最初の1回だけ実行するもの）
     if (!chatbotContainer) {
+
+        createDebugPanel();
         
         // DOMContentLoaded に相当する処理をここで行う
         window.setTimeout(() => {
@@ -84,7 +86,7 @@ function setupEventListeners() {
     
     // 画面サイズ変更時にもチェック
     mobileMediaQuery.addEventListener('change', handleMobileChange);
-}
+};
 
 // デバッグパネルを作成する関数
 function createDebugPanel() {
