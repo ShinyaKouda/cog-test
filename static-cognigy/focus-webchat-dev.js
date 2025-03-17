@@ -15,6 +15,7 @@ webchat.registerAnalyticsService(event => {
 
             // 見えるところだけに絞る
             chatbotContainer.style.height = `100px`
+            console.log('初期高さ：100pxに変更')
             
             // イベントリスナーの設定（1回だけ行う）
             setupEventListeners();
@@ -61,6 +62,7 @@ function setupEventListeners() {
             // モバイルサイズの場合、イベントリスナーを追加
             document.addEventListener('focusin', adjustHeightOnFocusIn);
             document.addEventListener('focusout', adjustHeightOnFocusOut);
+            console.log('モバイルのイベントリスナーを追加')
         } else {
             // モバイルサイズではない場合、イベントリスナーを削除
             document.removeEventListener('focusin', adjustHeightOnFocusIn);
@@ -72,12 +74,14 @@ function setupEventListeners() {
     function adjustHeightOnFocusIn(e) {
         setTimeout(() => {
             chatbotContainer.style.height = `${window.visualViewport.height}px`;
+            console.log('フォーカスイン：チャットの高さを${chatbotContainer.style.height}に変更')
         }, 1000);
     }
     
     function adjustHeightOnFocusOut(e) {
         setTimeout(() => {
             chatbotContainer.style.height = `${window.visualViewport.height}px`;//`100vh`;
+            console.log('フォーカスアウト：チャットの高さを${chatbotContainer.style.height}に変更')
         }, 1000);
     }
     
@@ -170,7 +174,7 @@ function createDebugPanel() {
     // スタイルの設定 - コントロールパネルの上に配置
     debugPanel.style.cssText = `
     position: fixed;
-    bottom: 95px; /* コントロールパネル+入力欄の高さ分の上に配置 */
+    bottom: 400px;
     left: 0;
     width: 100%;
     max-height: 40vh;
